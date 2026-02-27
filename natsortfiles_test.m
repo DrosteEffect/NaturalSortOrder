@@ -41,14 +41,14 @@ chk.i(Ab).o({'test.m';'test1.m';'test2.m';'test10.m';'test10-old.m'})
 chk.i(Ab).o({'test.m';'test1.m';'test2.m';'test10.m';'test10-old.m'}, [3;5;1;4;2]) % not in Mfile
 chk.i(Ab).o(@i, [3;5;1;4;2], {{'test',2,[];'test',10,'-old';'test',[],[];'test',10,[];'test',1,[]},{'.m';'.m';'.m';'.m';'.m'}}) % not in Mfile
 %
-Ac =        {'A2-old\test.m';'A10\test.m';'A2\test.m';'A1\test.m';'A1-archive.zip'};
-chk.i(Ac).o({'A1\test.m';'A1-archive.zip';'A2\test.m';'A2-old\test.m';'A10\test.m'})
-chk.i(Ac).o({'A1\test.m';'A1-archive.zip';'A2\test.m';'A2-old\test.m';'A10\test.m'}, [4;5;3;1;2]) % not in Mfile
+Ac =        {'A2-old/test.m';'A10/test.m';'A2/test.m';'A1/test.m';'A1-archive.zip'};
+chk.i(Ac).o({'A1/test.m';'A1-archive.zip';'A2/test.m';'A2-old/test.m';'A10/test.m'})
+chk.i(Ac).o({'A1/test.m';'A1-archive.zip';'A2/test.m';'A2-old/test.m';'A10/test.m'}, [4;5;3;1;2]) % not in Mfile
 chk.i(Ac).o(@i, [4;5;3;1;2], {{'A',2,'-old';'A',10,[];'A',2,[];'A',1,[];'A',1,'-archive'},{'test';'test';'test';'test';[]},{'.m';'.m';'.m';'.m';'.zip'}}) % not in Mfile
 %
-Ad =        {'A1\B','A+/B','A/B1','A=/B','A\B0'};
-chk.i(Ad).o({'A\B0','A/B1','A1\B','A+/B','A=/B'})
-chk.i(Ad).o({'A\B0','A/B1','A1\B','A+/B','A=/B'}, [5,3,1,2,4]) % not in Mfile
+Ad =        {'A1/B','A+/B','A/B1','A=/B','A/B0'};
+chk.i(Ad).o({'A/B0','A/B1','A1/B','A+/B','A=/B'})
+chk.i(Ad).o({'A/B0','A/B1','A1/B','A+/B','A=/B'}, [5,3,1,2,4]) % not in Mfile
 chk.i(Ad).o(@i, [5,3,1,2,4], {{'A',1;'A+',[];'A',[];'A=',[];'A',[]},{'B',[];'B',[];'B',1;'B',[];'B',0},cell(5,0)}) % not in Mfile
 %
 Af =        {'test_new.m';'test-old.m';'test.m'};
@@ -115,8 +115,8 @@ chk.i(... Ah
 	{'test2.m';'test10-old.m';'test.m';'test10.m';'test1.m'}).o(...
 	{'test.m';'test1.m';'test2.m';'test10.m';'test10-old.m'}, [3;5;1;4;2]) % index not in HTML
 chk.i(... Ai
-	{'A2-old\test.m';'A10\test.m';'A2\test.m';'AXarchive.zip';'A1\test.m'}).o(...
-	{'A1\test.m';'A2\test.m';'A2-old\test.m';'A10\test.m';'AXarchive.zip'}, [5;3;1;2;4]) % index not in HTML
+	{'A2-old/test.m';'A10/test.m';'A2/test.m';'AXarchive.zip';'A1/test.m'}).o(...
+	{'A1/test.m';'A2/test.m';'A2-old/test.m';'A10/test.m';'AXarchive.zip'}, [5;3;1;2;4]) % index not in HTML
 %
 Aj =                          txf({'1.23V.csv','-1V.csv','+1.csv','010V.csv','1.200V.csv'});
 chk.i(Aj                  ).o(txf({'1.23V.csv','1.200V.csv','010V.csv','+1.csv','-1V.csv'}))
@@ -129,6 +129,23 @@ chk.i(Aj, '[+-]?\d+\.?\d*').o(@i, [2,3,5,1,4], {{1.23,'V';-1,'V';1,[];10,'V';1.2
 Ak =                    txf({'1,3.txt', '1,10.txt', '1,2.txt'});
 chk.i(Ak, '\d+,?\d*').o(txf({'1,10.txt', '1,2.txt', '1,3.txt'}))
 chk.i(Ak, '\d+,?\d*').o(@i, [2,3,1], {{1.3;1.1;1.2},{'.txt';'.txt';'.txt'}}) % not in HTML
+%
+%% Hidden Files and Multidot %%
+%
+chk.i({'.z', 'a.z', '.a'}).o({'.a', '.z', 'a.z'}, [3,1,2])
+chk.i(...
+	{'.gitignore', '.bashrc', '.profile'}).o(...
+	{'.bashrc', '.gitignore', '.profile'}, [2,1,3])
+chk.i(...
+	{'archive.tar.gz', 'archive2.tar.gz', 'archive10.tar.gz', 'archive1.tar.gz'}).o(...
+	{'archive1.tar.gz','archive2.tar.gz', 'archive10.tar.gz', 'archive.tar.gz'}, [4,2,3,1])
+%
+% Shorter base name sorts before longer (the whole point of natsortfiles)
+chk.i({'file.x.z', 'file.z'}).o({'file.z', 'file.x.z'}, [2,1])
+%
+%% rmdot with only dot-entries -> should return empty
+chk.i({'.', '..'}        , [], 'rmdot').o(cell(1,0), zeros(1,0))
+chk.i({'.','.','..','..'}, [], 'rmdot').o(cell(1,0), zeros(1,0))
 %
 %% Numeric XOR Alphabetic %%
 
@@ -405,8 +422,8 @@ chk.i(...
 %
 % <https://blog.jooq.org/2018/02/23/how-to-order-file-names-semantically-in-java/>
 chk.i(...
-	{'C:\temp\version-1.sql','C:\temp\version-10.1.sql','C:\temp\version-10.sql','C:\temp\version-2.sql','C:\temp\version-21.sql'}).o(...
-	{'C:\temp\version-1.sql','C:\temp\version-2.sql','C:\temp\version-10.sql','C:\temp\version-10.1.sql','C:\temp\version-21.sql'})
+	{'C:/temp/version-1.sql','C:/temp/version-10.1.sql','C:/temp/version-10.sql','C:/temp/version-2.sql','C:/temp/version-21.sql'}).o(...
+	{'C:/temp/version-1.sql','C:/temp/version-2.sql','C:/temp/version-10.sql','C:/temp/version-10.1.sql','C:/temp/version-21.sql'})
 %
 % <http://www.davekoelle.com/alphanum.html>
 chk.i(...

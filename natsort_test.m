@@ -18,10 +18,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%natsort_test
 function nsoMain(chk)
 %
-try categorical(0); isc=true; catch; isc=false; chk.warn('No categorical class.'); end %#ok<CTCH,WNTAG>
-try sum(uint64(0)); isl=true; catch; isl=false; chk.warn('No (u)int64 class.'); end %#ok<CTCH,WNTAG>
-try pad(strings()); iss=true; catch; iss=false; chk.warn('No string class.'); end %#ok<CTCH,WNTAG>
 try arbsort({'X'}); isa=true; catch; isa=false; chk.warn('No ARBSORT() found.'); end %#ok<CTCH,WNTAG>
+try categorical(0); isc=true; catch; isc=false; chk.warn('No categorical class.'); end %#ok<CTCH,WNTAG>
+try datetime(8:10); isd=true; catch; isd=false; chk.warn('No datetime class.');end %#ok<CTCH,WNTAG>
+try pad(strings()); iss=true; catch; iss=false; chk.warn('No string class.'); end %#ok<CTCH,WNTAG>
+try sum(uint64(0)); isl=true; catch; isl=false; chk.warn('No (u)int64 class.'); end %#ok<CTCH,WNTAG>
 %
 if iss
 	txf = @string;
@@ -180,6 +181,39 @@ As =                    txf({'1,3', '1,10', '1,2'});
 chk.i(As, '\d+,?\d*').o(txf({'1,10', '1,2', '1,3'}))
 chk.i(As, '\d+,?\d*').o(txf({'1,10', '1,2', '1,3'}),[2,3,1]) % not in HTML
 chk.i(As, '\d+,?\d*').o(txf({'1,10', '1,2', '1,3'}),[2,3,1], {1.3;1.1;1.2}) % not in HTML
+%
+%% Datetime %%
+%
+if isd
+	D = datetime([2020,2019,2021], 1, 1);
+	chk.i(D).o(D([2,1,3]), [2,1,3])
+end
+%
+%% Empty Array %%
+%
+chk.i({}).o({}, [], {})
+chk.i(cell(0,7)).o(cell(0,7), zeros(0,7)) % shape is preserved
+chk.i({}, [], 'descend').o({}, [])
+%
+% Empty char matrix (0 rows)
+chk.i(char(zeros(0,4))).o(char(zeros(0,4)), zeros(0,1))
+%
+%% Char Matrix %%
+%
+chk.i('x3').o('x3', 1)
+CM = ['a2 '; 'a10'; 'a1 '];
+chk.i(CM             ).o(['a1 '; 'a2 '; 'a10'], [3;1;2])
+chk.i(CM,[],'ascend' ).o(['a1 '; 'a2 '; 'a10'], [3;1;2])
+chk.i(CM,[],'descend').o(['a10'; 'a2 '; 'a1 '], [2;1;3])
+%
+%% Function Handle %%
+%
+fnh = @(c)sort(regexprep(c,'[az]', '${char(''a''+''z''-$0)}')); % swap a & z
+%
+chk.i({'a','z','d','b','c'} , [], fnh).o({'z','b','c','d','a'} , [2,4,5,3,1])
+chk.i({'a1','z1','b1','c1'} , [], fnh).o({'z1','b1','c1','a1'} , [2,3,4,1])
+chk.i({'z1','z2','z0','z10'}, [], fnh).o({'z0','z1','z2','z10'}, [3,1,2,4])
+chk.i({'b1','a1','z2','c0'} , [], fnh).o({'z2','b1','c0','a1'} , [3,1,4,2])
 %
 %% Number Substring Table %%
 %

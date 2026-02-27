@@ -9,10 +9,10 @@ function [B,ndx,dbg] = natsortrows(A,rgx,varargin)
 % For a table/timetable array any string or cell-array-of-char-vector
 % variables are sorted alphanumerically, all other types via SORT/SORTROWS.
 % For a table/timetable the options above are supported and additionally:
-% - SORTROWS 'RowNames' and <rowDimName> options are supported.
+% - SORTROWS 'RowNames'/'RowTimes' and <rowDimName> options are supported.
 % - SORTROWS <vars> option is supported, selects the variables to sort by.
 %
-%   >> A = ["A2","X";"A10","Y";"A10","X","A1","X"];
+%   >> A = ["A2","X";"A10","Y";"A10","X";"A1","X"];
 %   >> natsortrows(A)
 %   ans =
 %       "A1"     "X"
@@ -146,8 +146,10 @@ function [B,ndx,dbg] = natsortrows(A,rgx,varargin)
 %         'ascend', 'descend', and/or 'ignore'. The number of cells must match
 %         the number of columns being sorted. The sign of <column> is ignored.
 %   <options> additionally supported for tables/timetables:
-%       = 'RowNames' or <rowDimName> (the name of first dimension of
-%         table <A>): sorts table <A> based on its row names.
+%       = 'RowNames': sorts table <A> based on its row names.
+%       = 'RowTimes': sorts timetable <A> based on its row times.
+%       = <rowDimName> (the name of first dimension of (time)table <A>):
+%         sorts (time)tables <A> based on its row names/times.
 %       = <vars>: a cell array containing the names (character row vectors)
 %         of the timetable/table <A> variables to sort by.
 %   Any remaining <options> are passed directly to NATSORT.
@@ -180,8 +182,9 @@ dbg = cell(1,nmc);
 %
 dai = {'descend','ascend','ignore'};
 iso = false;
-ist = isa(A,'table') || isa(A,'timetable'); % istabular
-chk = 'RowNames|SortNum';
+ist = isa(A,'table');
+isi = isa(A,'timetable');
+chk = 'RowNames|RowTimes';
 %
 varargin = cellfun(@nsr1s2c, varargin, 'UniformOutput',false);
 ixv = fnh(varargin); % char
@@ -217,36 +220,55 @@ else
 	axc = 1:nmc;
 end
 %
-if ist % table
+if isi % timetable
+	assert(~any(strcmpi(txt,'RowNames')),'SC:natsortrows:RowNames:InvalidForTimetable',...
+		'The option "RowNames" is not valid for timetables, only for tables.')
+	prn = {};
+	rnm = 'RowTimes';
+elseif ist % table
+	assert(~any(strcmpi(txt,'RowTimes')),'SC:natsortrows:RowTimes:InvalidForTable',...
+		'The option "RowTimes" is not valid for tables, only for timetables.')
 	prn = A.Properties.RowNames;
+	rnm = 'RowNames';
+end
+%
+if ist || isi % table | timetable
 	pvn = A.Properties.VariableNames;
 	pdn = A.Properties.DimensionNames(1);
 	%
-	chk = sprintf('|%s','SortNum',prn{:},pvn{:},pdn{:});
-	chk = sprintf('RowNames%s',chk);
+	chk = sprintf('|%s','RowTimes',prn{:},pvn{:},pdn{:});
+	chk = sprintf('%s','RowNames',chk); % both keywords are always included
 	%
 	tvn = ismember(txt,pvn);
-	trn = strcmpi(txt,'RowNames') | strcmpi(txt,pdn);
+	trn = strcmpi(txt,rnm) | strcmpi(txt,pdn);
 	%
 	if any(trn) % sort by table row names
 		assert(nnz(trn)<2,...
-			'SC:natsortrows:RowNames:Overspecified',...
-			'The "RowNames" or <rowDimName> option is over-specified, may be used once.')
+			sprintf('SC:natsortrows:%s:Overspecified',rnm),...
+			'The "%s" or <rowDimName> option is over-specified, may be used once.',rnm)
 		assert(~any(xca|xbo|xnu) && ~any(tvn),...
-			'SC:natsortrows:RowNames:NotExclusive',...
-			'The "RowNames" or <rowDimName> option cannot be combined with <column> or <var> options.')
+			sprintf('SC:natsortrows:%s:NotExclusive',rnm),...
+			'The "%s" or <rowDimName> option cannot be combined with <column> or <var> options.',rnm)
 		txt(trn) = [];
 		if nargin>1
 			nsrChkRgx(rgx,chk)
 			txt = [{rgx},txt];
 		end
 		dbg = {[]};
-		if numel(prn)
-			if nargout<3 % faster:
-				[~,ndx] = natsort(prn,txt{:},xtx{:});
-			else % for debugging:
-				[~,ndx,dbg] = natsort(prn,txt{:},xtx{:});
+		if ist % table
+			if numel(prn)
+				if nargout<3 % faster:
+					[~,ndx] = natsort(prn,txt{:},xtx{:});
+				else % for debugging:
+					[~,ndx,dbg] = natsort(prn,txt{:},xtx{:});
+				end
+			else
+				warning('SC:natsortrows:RowNames:NoRowNames',...
+					'The input table does not contain row names, returning the input unsorted.')
 			end
+		elseif isi % timetable
+			idd = strcmpi(txt,'descend') | strcmpi(txt,'ascend');
+			[~,ndx] = sort(A.Properties.RowTimes,txt{idd});
 		end
 		ndx = ndx(:);
 		B = A(ndx,:);
@@ -286,7 +308,7 @@ if ist % table
 					'The <vars> option is over-specified, may be used only once.')
 				assert(~any(xbo|xnu),...
 					'SC:natsortrows:vars:NotExclusive',...
-					'The <vars> option cannot be combined with <column> or RowName options.')
+					'The <vars> option cannot be combined with <column> or RowName/RowTime options.')
 				axc = nan(size(sbc));
 				for kk = 1:numel(sbc)
 					tmp = strcmp(sbc{kk},pvn);
@@ -341,7 +363,7 @@ for ii = numel(axc):-1:1
 	end
 	if any(strcmpi(txt,'ignore'))
 		continue
-	elseif ist % table
+	elseif ist || isi % table | timetable
 		tmp = A{ndx,axk};
 		if isa(tmp,'string')||iscell(tmp)&&all(fnh(tmp(:)))
 			if size(tmp,2)==1
@@ -355,12 +377,12 @@ for ii = numel(axc):-1:1
 			else
 				[~,idx] = natsortrows(tmp,txt{:},xtx{:});
 			end
-		else % numeric, logical, categorical, datetime, etc.
+		else % numeric | logical | categorical | datetime, etc.
 			isd = any(strcmpi(txt,'descend'));
 			col = (1-2*isd).*(1:size(tmp,2));
 			[~,idx] = sortrows(tmp,col);
 		end
-	else % char, string, cell of char vectors, categorical, datetime, etc.
+	else % char | string | cell of char vectors | categorical | datetime | etc.
 		if nargout<3 % faster:
 			[~,idx] = natsort(A(ndx,axk),txt{:},xtx{:});
 		else % for debugging:

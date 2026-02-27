@@ -97,7 +97,7 @@ classdef test_nso_fun < handle
 						xpT = class(xpA);
 					elseif ~tnfIsEqNan(opA,xpA)
 						boo(k) = true;
-						if isa(xpA,'table')
+						if isa(xpA,'table') || isa(xpA,'timetable')
 							opV = opA.Properties.VariableNames;
 							xpV = xpA.Properties.VariableNames;
 							if isequal(opV,xpV)

@@ -20,7 +20,9 @@ function mainfun(chk)
 % All should pass:
 chk.i([],'',{},"X").o([],'',{},"X")
 chk.i(123:4567,NaN).o(123:4567,NaN)
+chk.i(NaN,[1,NaN,3]).o(NaN,[1,NaN,3])
 % 1st should pass, 2nd should fail:
+chk.i(NaN,[1,NaN,3]).o(NaN,[1,0,3])
 chk.i([],[]).o([],'') % double vs char
 chk.i([],[]).o([],"") % double vs string
 chk.i([],'').o([],{}) % char vs cell

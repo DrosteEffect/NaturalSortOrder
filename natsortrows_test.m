@@ -19,8 +19,9 @@ end
 function nsrMain(chk)
 %
 try categorical(0); isc=true; catch; isc=false; chk.warn('No categorical class.'); end %#ok<CTCH,WNTAG>
-try cell2table({}); ist=true; catch; ist=false; chk.warn('No (time)table class.'); end %#ok<CTCH,WNTAG>
 try pad(strings()); iss=true; catch; iss=false; chk.warn('No string class.'); end %#ok<CTCH,WNTAG>
+try cell2table({}); ist=true; catch; ist=false; chk.warn('No table class.'); end %#ok<CTCH,WNTAG>
+try timetable(NaT); isi=true; catch; isi=false; chk.warn('No timetable class.'); end %#ok<CTCH,WNTAG>
 %
 if iss
 	txf = @string;
@@ -107,6 +108,44 @@ Ah =                    txf({'1,3'; '1,10'; '1,2'});
 chk.i(Ah, '\d+,?\d*').o(txf({'1,10'; '1,2'; '1,3'}))
 chk.i(Ah, '\d+,?\d*').o(txf({'1,10'; '1,2'; '1,3'}), [2;3;1]) % not in HTML
 chk.i(Ah, '\d+,?\d*').o(@i, [2;3;1], {{1.3;1.1;1.2}}) % not in HTML
+%
+%% Special Cases %%
+%
+chk.i(['b2';'a1';'c3']).o(['a1';'b2';'c3'], [2;1;3])
+%
+%% RowNames / RowTimes Tests %%
+%
+if ist
+	T0 = cell2table({'B';'A';'C'}, 'RowNames',{'r2','r10','r1'});
+	chk.i(T0, [], 'RowNames'           ).o(T0([3,1,2],:), [3;1;2])
+	chk.i(T0, [], 'RowNames',  'ascend').o(T0([3,1,2],:), [3;1;2])
+	chk.i(T0, [], 'RowNames', 'descend').o(T0([2,1,3],:), [2;1;3])
+	% "Row" is the default 1st dimension name:
+	chk.i(T0, [], 'Row').o(T0([3,1,2],:), [3;1;2])
+	%
+	% Non-integer row names:
+	T1 = cell2table({'X';'Y';'Z'}, 'RowNames',{'1.3','1.10','1.2'});
+	chk.i(T1,          [], 'RowNames').o(T1([3,1,2],:), [3;1;2])   % default regex
+	chk.i(T1, '\d+\.?\d*', 'RowNames').o(T1([2,3,1],:), [2;3;1])   % decimal regex
+	%
+	% Option 'RowNames' on a table that has no row names should issue a
+	% warning and return the table unsorted, just like SORTROWS does.
+	wrn = warning('off','SC:natsortrows:RowNames:NoRowNames');
+	T2 = cell2table({'B';'A';'C'});
+	chk.i(T2, [], 'RowNames').o(T2)
+	warning(wrn)
+end
+%
+if isi
+	% 3rd Jan, 1st Jan, 4th Jan, 2nd Jan 2026.
+	TT = timetable(datetime(2024,1,[3;1;4;2]), {'x20';'x2';'x1';'x10'});
+	chk.i(TT                           ).o(TT([3,2,4,1],:), [3;2;4;1])
+	chk.i(TT, [],              'ascend').o(TT([3,2,4,1],:), [3;2;4;1])
+	chk.i(TT, [],             'descend').o(TT([1,4,2,3],:), [1;4;2;3])
+	chk.i(TT, [], 'RowTimes'           ).o(TT([2,4,1,3],:), [2;4;1;3])
+	chk.i(TT, [], 'RowTimes',  'ascend').o(TT([2,4,1,3],:), [2;4;1;3])
+	chk.i(TT, [], 'RowTimes', 'descend').o(TT([3,1,4,2],:), [3;1;4;2])
+end
 %
 %% Index Stability %%
 %

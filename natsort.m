@@ -180,7 +180,7 @@ else % Convert string, categorical, datetime, enumeration, etc.:
 	C = cellstr(A(:));
 end
 %
-chk = '(match|ignore)(case|dia)|(de|a)scend(ing)?|(char|nan|num)[<>](char|nan|num)|%[a-z]+';
+chk = '(match|ignore)case|(de|a)scend(ing)?|(char|nan|num)[<>](char|nan|num)|%[a-z]+';
 %
 if nargin<2 || isnumeric(rgx)&&isequal(rgx,[])
 	rgx = '\d+';

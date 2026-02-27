@@ -19,8 +19,8 @@ end
 function astMain(chk)
 %
 try pad(strings(01)); iss=true; catch; iss=false; chk.warn('No string class.'); end %#ok<NASGU,CTCH,WNTAG>
-try words2num('one'); isw=true; catch; isw=false; chk.warn('No WORDS2NUM() found.'); end %#ok<CTCH,WNTAG>
 try sip2num('123 M'); isp=true; catch; isp=false; chk.warn('No SIP2NUM() found.'); end %#ok<CTCH,WNTAG>
+try words2num('one'); isw=true; catch; isw=false; chk.warn('No WORDS2NUM() found.'); end %#ok<CTCH,WNTAG>
 %
 %% Mfile Examples %%
 %
