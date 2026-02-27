@@ -24,11 +24,11 @@
 %
 % Other useful text sorting functions:
 %
-% * Alphanumeric sort of filenames, foldernames, and filepaths:
+% * Natural order sort of filenames, foldernames, and filepaths:
 % <https://www.mathworks.com/matlabcentral/fileexchange/47434 |NATSORTFILES|>
-% * Alphanumeric sort the rows of a string/cell/table/etc array:
+% * Natural order sort the rows of a string/cell/table/etc array:
 % <https://www.mathworks.com/matlabcentral/fileexchange/47433 |NATSORTROWS|>
-% * Alphanumeric sort of text in a string/cell/categorical array:
+% * Natural order sort of text in a string/cell/categorical array:
 % <https://www.mathworks.com/matlabcentral/fileexchange/34464 |NATSORT|>
 %% Basic Usage: Ignore Diacritics
 % Common practice when sorting English text is that diacritics are ignored.

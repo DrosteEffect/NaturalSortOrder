@@ -2,12 +2,12 @@
 % The function <https://www.mathworks.com/matlabcentral/fileexchange/47434
 % |NATSORTFILES|> sorts filenames or filepaths in an array |A| (cell/string/struct)
 % taking into account number values within the text. This is known as
-% _natural order_ or _alphanumeric order_. Note that MATLAB's inbuilt
-% <https://www.mathworks.com/help/matlab/ref/sort.html |SORT|> function
-% sorts text by <https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html
+% <https://en.wikipedia.org/wiki/Natural_sort_order _natural sort order_>.
+% Note that MATLAB's inbuilt <https://www.mathworks.com/help/matlab/ref/sort.html
+% |SORT|> function sorts text by <https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html
 % character code>, as does |SORT| in most programming languages.
 %
-% |NATSORTFILES| does not just provide a naive alphanumeric sort, it also
+% |NATSORTFILES| does not just provide a naive natural sort order, it also
 % splits and sorts the file/folder names and file extensions separately,
 % which means that shorter names come before longer ones. For the same reason
 % filepaths are split at every path-separator character and each folder level
@@ -15,9 +15,9 @@
 %
 % Other useful text sorting functions:
 %
-% * Alphanumeric sort the rows of a string/cell/table/etc array:
+% * Natural order sort the rows of a string/cell/table/etc array:
 % <https://www.mathworks.com/matlabcentral/fileexchange/47433 |NATSORTROWS|>
-% * Alphanumeric sort of text in a string/cell/categorical array:
+% * Natural order sort of text in a string/cell/categorical array:
 % <https://www.mathworks.com/matlabcentral/fileexchange/34464 |NATSORT|>
 % * Sort text into the order of arbitrary/custom text sequences:
 % <https://www.mathworks.com/matlabcentral/fileexchange/132263 |ARBSORT|>
@@ -107,7 +107,7 @@ sort(Ag) % '-' sorts before '.'
 natsort(Ag) % '-' sorts before '.'
 natsortfiles(Ag) % short before long
 %% Explanation: Filenames
-% |NATSORTFILES| sorts the split name parts using an alphanumeric sort, so
+% |NATSORTFILES| sorts the split name parts using an natural sort order, so
 % that the number values within the filenames are taken into consideration:
 Ah = ["test2.m"; "test10-old.m"; "test.m"; "test10.m"; "test1.m"];
 sort(Ah) % Wrong number order.

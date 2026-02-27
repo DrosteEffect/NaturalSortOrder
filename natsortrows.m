@@ -6,8 +6,8 @@ function [B,ndx,dbg] = natsortrows(A,rgx,varargin)
 % Sort text by character code and by number value. For a cell/string array:
 % - SORTROWS <column> option is supported, selects the columns to sort by.
 % - SORTROWS <direction> option is supported, specifies the sort directions.
-% For a table/timetable array any string or cell-array-of-char-vector
-% variables are sorted alphanumerically, all other types via SORT/SORTROWS.
+% For a table/timetable array any string or cell-array-of-char column-vector
+% variables use natural sort order, all other types via SORT/SORTROWS.
 % For a table/timetable the options above are supported and additionally:
 % - SORTROWS 'RowNames'/'RowTimes' and <rowDimName> options are supported.
 % - SORTROWS <vars> option is supported, selects the variables to sort by.
@@ -155,7 +155,7 @@ function [B,ndx,dbg] = natsortrows(A,rgx,varargin)
 %   Any remaining <options> are passed directly to NATSORT.
 %
 %%% Outputs:
-% B   = Array <A> with rows sorted into alphanumeric order.
+% B   = Array <A> with rows sorted into natural sort order.
 % ndx = NumericVector, size Mx1. The row indices such that B = A(ndx,:).
 % dbg = CellArray, size 1xN. Each cell contains the debug cell array for
 %       one column of <A>. Helps debug the regular expression (see NATSORT).

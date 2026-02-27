@@ -2,16 +2,16 @@
 % The function <https://www.mathworks.com/matlabcentral/fileexchange/34464
 % |NATSORT|> sorts the elements of a text array |A| (cell/string/...)
 % taking into account number values within the text. This is known as
-% _natural order_ or _alphanumeric order_. Note that MATLAB's inbuilt
-% <https://www.mathworks.com/help/matlab/ref/sort.html |SORT|> function
-% sorts text by <https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html
+% <https://en.wikipedia.org/wiki/Natural_sort_order _natural sort order_>.
+% Note that MATLAB's inbuilt <https://www.mathworks.com/help/matlab/ref/sort.html
+% |SORT|> function sorts text by <https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html
 % character code>, as does |SORT| in most programming languages.
 %
 % Other useful text sorting functions:
 %
-% * Alphanumeric sort of filenames, foldernames, and filepaths:
+% * Natural order sort of filenames, foldernames, and filepaths:
 % <https://www.mathworks.com/matlabcentral/fileexchange/47434 |NATSORTFILES|>
-% * Alphanumeric sort the rows of a string/cell/table/etc array:
+% * Natural order sort the rows of a string/cell/table/etc array:
 % <https://www.mathworks.com/matlabcentral/fileexchange/47433 |NATSORTROWS|>
 % * Sort text into the order of arbitrary/custom text sequences:
 % <https://www.mathworks.com/matlabcentral/fileexchange/132263 |ARBSORT|>
@@ -161,10 +161,10 @@ Aq = [' 9';'23';'10';' 0';'5 '] % character matrix.
 natsort(Aq) % default matches only digits, whitespace is significant.
 natsort(Aq,'\s*\d+\s*') % match and ignore whitespace.
 %% Example: Categorical Categories
-% These examples show how to create categories in alphanumeric order, and
+% These examples show how to create categories in natural sort order, and
 % how to use |REORDERCATS| to change the category order of such an array:
 Ar = ["a2", "a10", "a1"];
-% default categories order is not alphanumeric order:
+% default categories order is not natural sort order:
 P = categorical(Ar);
 categories(P)
 % reorder categories of an existing categorical array:
