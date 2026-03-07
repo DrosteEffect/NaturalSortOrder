@@ -1,4 +1,5 @@
-%% |ARBSORT| Examples
+%% |ARBSORT| User Guide
+%
 % The function <https://www.mathworks.com/matlabcentral/fileexchange/132263
 % |ARBSORT|> sorts the elements of the input array |A| into the order
 % the provided custom/arbitrary text sequences (aka _custom lists_).
@@ -30,7 +31,9 @@
 % <https://www.mathworks.com/matlabcentral/fileexchange/47433 |NATSORTROWS|>
 % * Natural order sort of text in a string/cell/categorical array:
 % <https://www.mathworks.com/matlabcentral/fileexchange/34464 |NATSORT|>
+%
 %% Basic Usage: Ignore Diacritics
+%
 % Common practice when sorting English text is that diacritics are ignored.
 % By default |ARBSORT| performs a case-insensitive ascending sort of the
 % input text array |A|, ignoring any diacritics. Compare for example:
@@ -38,6 +41,7 @@ Aa = ["Rosé","Rosy","Rosa","Rose"];
 sort(Aa) % ASCIIbetical
 arbsort(Aa)
 %% Input 2+: Sequence Text Arrays
+%
 % A sequence is supplied as a |1xN| string array or |1xN| cell array of char
 % vectors. By default |ARBSORT| interprets the sequence text as
 % <https://www.mathworks.com/help/matlab/matlab_prog/regular-expressions.html
@@ -51,6 +55,7 @@ Sb = ["small","medium","large"]; % ...into the order of this text sequence.
 arbsort(Ab,Sb)
 arbsort(Ab,Sb,["tea","coffee"]) % or more sequences.
 %% Input 2+: Sequence Function Handles (e.g. |WORDS2NUM|)
+%
 % A sequence may be specified using a <https://www.mathworks.com/help/matlab/function-handles.html
 % function handle>. The function must accept one input (text, either as a
 % scalar string or a character vector) and return the following two outputs:
@@ -70,6 +75,7 @@ arbsort(Ab,Sb,["tea","coffee"]) % or more sequences.
 Ac = ["test_one", "test_zero", "test_ninetynine", "test_two"];
 arbsort(Ac, @words2num) % download WORDS2NUM from FEX 52925.
 %% Input 2+: Replacement Text Array
+%
 % The sorting rules of some languages require that certain characters are
 % sorted as if they were replaced by other characters. For example, in
 % French the ligatures "æ" and "œ" are sorted as "ae" and "oe" respectively.
@@ -83,6 +89,7 @@ Rd = ["Æ", "Œ";... row1: match text
 sort(Ad) % ASCIIbetical
 arbsort(Ad,Rd)
 %% Input 2+: Partial/Whole Text Matching
+%
 % By default |ARBSORT| performs partial text matches, i.e. _parts_ of the
 % text in |A| can match the sequence text. Specify the |'whole'| option
 % to match only the _complete_ elements of |A| to the sequence text.
@@ -93,6 +100,7 @@ Se = ["S","M","L"];
 arbsort(Ae,Se, 'partial') % default
 arbsort(Ae,Se, 'whole')
 %% Input 2+: Case Sensitive/Insensitive Text Matching
+%
 % By default |ARBSORT| matches sequence text regardless of character case.
 % The |'matchcase'| option may be specified to only match text with the
 % same character case.
@@ -101,6 +109,7 @@ Sf = ["S","M","L"];
 arbsort(Af,Sf, 'ignorecase') % default
 arbsort(Af,Sf, 'matchcase')
 %% Input 2+: Diacritic Sensitive/Insensitive Text Matching
+%
 % By default |ARBSORT| removes diacritics from any unmatched characters,
 % just before sorting. This suits common practice in many languages, where
 % diacritics (that might not be defined in that language) are ignored when
@@ -110,6 +119,7 @@ Ag = ["Zoë","Zoz","Zoa"];
 arbsort(Ag, 'ignoredia') % default
 arbsort(Ag, 'matchdia')
 %% Input 2+: Literal/Regular Expression Text Matching
+%
 % By default |ARBSORT| treats the sequence text as regular expressions,
 % to allow very compact, powerful sequence definitions. The |'literal'|
 % option can be used to treat the sequence text literally.
@@ -118,6 +128,7 @@ Sh = ["\s","s"];
 arbsort(Ah,Sh, 'regexp') % default
 arbsort(Ah,Sh, 'literal')
 %% Output 2: Sort Index
+%
 % The 2nd output |ndx| is a numeric array of the sort indices,
 % in general such that |B = A(ndx)| where |B = arbsort(A,...)|.
 % Note that |ARBSORT| provides a _stable sort:_
@@ -125,6 +136,7 @@ Ai = ["testHigh","testLow","testMid","testLow"];
 Si = ["low","mid","high"];
 [out,ndx] = arbsort(Ai,Si)
 %% Output 3: Parsed-Text Array
+%
 % The 3rd output |dbg| is an |RxC| cell array which contains both the
 % matched and split text parts. This cell array is intended for debugging,
 % by visually confirming that the content of |A| is being matched as
@@ -135,6 +147,7 @@ Si = ["low","mid","high"];
 % of array |A|.
 [~,~,dbg] = arbsort(Ai,Si)
 %% Output 4: Sequence Vector
+%
 % The 4th output |seq| is a |1xC| numeric vector indicating which sequence
 % (i.e. input array or function) corresponds to each column of the 3rd
 % output |dbg|, where the values indicate the function input positions
@@ -143,6 +156,7 @@ Si = ["low","mid","high"];
 % (i.e. the column contains split text).
 [~,~,~,seq] = arbsort(Ai,Si)
 %% Example: Alphabet Character Order
+%
 % Many languages do not sort correctly when sorted into ASCII/Unicode code
 % order, particularly languages using diacritics, e.g. Spanish, Swedish,
 % etc. Specify the alphabet as the final text sequence. By default
@@ -153,6 +167,7 @@ arbsort(Aj, alfabeto)
 Ak = ["radio", "rana", "rastrillo", "ráfaga", "rápido"];
 arbsort(Ak, alfabeto)
 %% Example: Alphabet Equivalent Characters
+%
 % The power of regular expressions makes it easy to specify characters
 % that are equivalent to each other. For example, the Dutch digraph "ij"
 % (sometimes written using the ligature "ĳ") sorts either
@@ -167,6 +182,7 @@ arbsort(Al, alfabet)
 alfabet = [num2cell('A':'X'),{'Ĳ|IJ|Y','Z'}]; % telephone
 arbsort(Al, alfabet)
 %% Example: Digraphs and Trigraphs
+%
 % Digraphs and trigraphs may be defined as part of the final alphabet 
 % sequence. For example, Hungarian defines 'cs', 'dz', 'dzs' and various 
 % other digraphs as letters of the alphabet. Reminder: my simple |ARBSORT|
@@ -175,6 +191,7 @@ abece = ["a|á","b","c","cs","d","dz","dzs","e|é","f","g","gy","h","i|í","j","
 Ahu = ["apa", "asz", "csak", "cukor", "dzsungel", "dzűmmög", "ár"];
 arbsort(Ahu,abece)
 %% Example: Multiple Sequences
+%
 % Zero or more sequences may be provided. Sequences are matched to text
 % of |A| in the same order as they are provided as inputs to |ARBSORT|.
 % This example uses Swedish weeekday names and the Swedish alphabet:
@@ -183,11 +200,13 @@ vardagar = ["Mån(dag)?","Tis(dag)?","Ons(dag)?","Tors(dag)?","Fre(dag)?","Lör(
 alfabet  = num2cell(['A':'Z','ÅÄÖ']); % Swedish alphabet.
 arbsort(Am, vardagar, alfabet) % match weekday names first, then alphabet.
 %% Example: Leading/Trailing Whitespace
+%
 % Text that is aligned and padded with whitespace can be sorted e.g. by
 % appending/prepending |'\s*'| to the sequence regular expressions:
 An = ['Y  large';'X medium';'Z  large';'X  small';'X  large'];
 arbsort(An, ["\s*SMALL","\s*MEDIUM","\s*LARGE"])
 %% Bonus: SI Prefixes with |SIP2NUM| or |BIP2NUM|
+%
 % |ARBSORT| may be used with the SI/binary prefix functions
 % <https://www.mathworks.com/matlabcentral/fileexchange/53886 |SIP2NUM|
 % and |BIP2NUM|>, both of which fulfill the requirements for a sequence
@@ -195,6 +214,7 @@ arbsort(An, ["\s*SMALL","\s*MEDIUM","\s*LARGE"])
 Ao = ["test9.9µV","test10mV","test13nV","test2mV","test1nV"];
 arbsort(Ao, @sip2num) % download SIP2NUM from FEX 53886.
 %% Bonus: Arrays with |NATSORT| or |NATSORTFILES|
+%
 % |ARBSORT| may be used with
 % <https://www.mathworks.com/matlabcentral/fileexchange/34464 |NATSORT|> or
 % <https://www.mathworks.com/matlabcentral/fileexchange/47434 |NATSORTFILES|>
@@ -202,6 +222,7 @@ arbsort(Ao, @sip2num) % download SIP2NUM from FEX 53886.
 Ap = ["Zoë 2.txt";"Zoz 1.txt";"Zoa 2";"Zoë 10.txt";"Zoa 10.txt";"Zoë 1.txt"];
 natsortfiles(Ap, [], @arbsort) % download NATSORTFILES from FEX 47434.
 %% Bonus: Tables with |NATSORTROWS|
+%
 % |ARBSORT| may be used with
 % <https://www.mathworks.com/matlabcentral/fileexchange/47433 |NATSORTROWS|>,
 % e.g. to sort the columns of a table into a arbitrary sequence order. This
@@ -209,7 +230,8 @@ natsortfiles(Ap, [], @arbsort) % download NATSORTFILES from FEX 47434.
 Tq = readtable('./html/excel-easy.xlsx')
 Fq = @(t)arbsort(t,["HIGH","NORMAL","LOW"]);
 natsortrows(Tq, [], 'Priority', Fq)
-%% Bonus: Interactive Regular Expression Tool
+%% Bonus: Interactive Regular Expression Tool |IREGEXP|
+%
 % Regular expressions are powerful and compact, but getting them right is
 % not always easy. One assistance is to download my interactive tool
 % <https://www.mathworks.com/matlabcentral/fileexchange/48930 |IREGEXP|>,
