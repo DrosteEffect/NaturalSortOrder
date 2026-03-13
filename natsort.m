@@ -161,10 +161,18 @@ function [B,ndx,dbg] = natsort(A,rgx,varargin)
 %
 % See also SORT NATSORT_TEST NATSORTFILES NATSORTROWS ARBSORT
 % IREGEXP REGEXP COMPOSE STRING STRINGS CATEGORICAL CELLSTR SSCANF
-
-%% Input Wrangling %%
-%
 fnh = @(c)cellfun('isclass',c,'char') & cellfun('size',c,1)<2 & cellfun('ndims',c)<3;
+% Release | Feature
+% --------|--------
+% R2007a  | bsxfun
+% R2007b  | regexp/regexpi: cell array of char, once & match & split options
+% R2008a  | assert: message-identifier
+% R2009b  | tilde argument placeholder
+% R2013b  | categorical class                            [only if supplied]
+% R2014b  |    datetime class                            [only if supplied]
+% R2016b  |      string class                            [only if supplied]
+%
+%% Input Wrangling %%
 %
 if iscell(A)
 	assert(all(fnh(A(:))),...

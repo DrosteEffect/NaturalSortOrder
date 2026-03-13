@@ -137,10 +137,18 @@ function [B,ndx,dbg] = natsortfiles(A,rgx,varargin)
 %
 % See also SORT NATSORTFILES_TEST NATSORT NATSORTROWS ARBSORT IREGEXP
 % REGEXP DIR FILEPARTS FULLFILE NEXTNAME STRING CELLSTR SSCANF
-
-%% Input Wrangling %%
-%
 fnh = @(c)cellfun('isclass',c,'char') & cellfun('size',c,1)<2 & cellfun('ndims',c)<3;
+% Release | Feature
+% --------|--------
+% R2007a  | bsxfun
+% R2007b  | regexp/regexpi: cell array of char, match option
+% R2008a  | assert: message-identifier
+% R2009b  | tilde argument placeholder
+% R2013b  | struct returned by DIR includes a 'folder' field
+%         |     [only relevant when a DIR struct with 'folder' is supplied]
+% R2016b  | string class                                 [only if supplied]
+%
+%% Input Wrangling %%
 %
 if isstruct(A)
 	assert(isfield(A,'name'),...

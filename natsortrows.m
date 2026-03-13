@@ -167,10 +167,19 @@ function [B,ndx,dbg] = natsortrows(A,rgx,varargin)
 %
 % See also SORT SORTROWS NATSORTROWS_TEST NATSORT NATSORTFILES ARBSORT IREGEXP
 % REGEXP COMPOSE STRING CATEGORICAL CELL2TABLE ARRAY2TABLE TABLE TIMETABLE CELLSTR SSCANF
-
-%% Input Wrangling %%
-%
 fnh = @(c)cellfun('isclass',c,'char') & cellfun('size',c,1)<2 & cellfun('ndims',c)<3;
+% Release | Feature
+% --------|--------
+% R2007b  | regexp/regexpi: cell array of char, once option
+% R2008a  | assert: message-identifier
+% R2009b  | tilde argument placeholder
+% R2013b  |       table class, curly-brace indexing      [only if supplied]
+% R2016b  |   timetable class, curly-brace indexing      [only if supplied]
+% R2013b  | categorical class                            [only if supplied]
+% R2014b  |    datetime class                            [only if supplied]
+% R2016b  |      string class                            [only if supplied]
+%
+%% Input Wrangling %%
 %
 assert(ndims(A)<3,...
 	'SC:natsortrows:A:NotMatrix',...

@@ -158,10 +158,18 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 %
 % See also SORT ARBSORT_TEST NATSORT NATSORTFILES NATSORTROWS WORDS2NUM
 % SIP2NUM IREGEXP REGEXP COMPOSE STRING STRINGS CATEGORICAL CELLSTR SSCANF
-
-%% Input Wrangling %%
-%
 fnh = @(c)cellfun('isclass',c,'char') & cellfun('size',c,1)<2 & cellfun('ndims',c)<3;
+% Release | Feature
+% --------|--------
+% R2007a  | regexptranslate
+% R2007b  | regexp/regexpi: cell array of char, match & split options
+% R2008a  | assert: message-identifier
+% R2009b  | tilde argument placeholder
+% R2013b  | categorical class                            [only if supplied]
+% R2014b  |    datetime class                            [only if supplied]
+% R2016b  |      string class                            [only if supplied]
+%
+%% Input Wrangling %%
 %
 if iscell(A)
 	assert(all(fnh(A(:))),...
