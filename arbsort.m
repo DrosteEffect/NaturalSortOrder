@@ -20,13 +20,7 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 %   [B,ndx,dbg,seq] = arbsort(A,...)
 %
 % Zero or more sequence text arrays, sequence function handles, and/or
-% replacement text arrays are processed in their input order.
-%
-% To sort the elements of a string/cell array use NATSORT (File Exchange 34464)
-% To sort the rows of a string/cell/table use NATSORTROWS (File Exchange 47433)
-% To sort any file-names or folder-names use NATSORTFILES (File Exchange 47434)
-%
-%% Examples %%
+% replacement text arrays are processed in their input order:
 %
 %   >> A = ["LargeBurger", "MediumCoffee", "SmallCoffee", "MediumBurger"];
 %   >> sort(A) % ASCIIbetical
@@ -35,6 +29,10 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 %   ans =  ["SmallCoffee"  "MediumBurger"  "MediumCoffee"  "LargeBurger"]
 %   >> arbsort(A, ["coffee","burger"],["small","medium","large"])
 %   ans =  ["SmallCoffee"  "MediumCoffee"  "MediumBurger"  "LargeBurger"]
+%
+% To sort the elements of a string/cell array use NATSORT (File Exchange 34464)
+% To sort the rows of a string/cell/table use NATSORTROWS (File Exchange 47433)
+% To sort any file-names or folder-names use NATSORTFILES (File Exchange 47434)
 %
 %% Sequence Text Array %%
 %
