@@ -2,7 +2,7 @@
 %
 % The function <https://www.mathworks.com/matlabcentral/fileexchange/132263
 % |ARBSORT|> sorts the elements of the input array |A| into the order
-% the provided custom/arbitrary text sequences (aka _custom lists_).
+% of the provided custom/arbitrary text sequences (aka _custom lists_).
 %
 % |ARBSORT| was inspired by MS Excel's
 % <https://support.microsoft.com/en-us/office/sort-data-using-a-custom-list-cba3d67a-c5cb-406f-9b14-a02205834d72
@@ -16,7 +16,7 @@
 % While |ARBSORT| offers some basic functionality for alphabetical sorting,
 % it is beyond the scope of my small project to provide language-specific
 % collation rules, e.g. identify compound words, identify word roots,
-% split ligatures, provide reverse sorting of accented characters, etc.
+% provide reverse sorting of accented characters, etc.
 %
 % Note that MATLAB's inbuilt
 % <https://www.mathworks.com/help/matlab/ref/sort.html |SORT|> function
@@ -50,7 +50,7 @@ arbsort(Aa)
 % <https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html
 % character-code> order
 % (by default ignoring any diacritics on the unmatched characters).
-Ab = ["SmallTea";"MediumCoffee";"LargeTea";"SmallCoffee";"MediumTea";"LargeCoffee"]; % Array to sort...
+Ab = ["Small Tea";"Medium Coffee";"Large Tea";"Small Coffee";"Medium Tea";"Large Coffee"]; % Array to sort...
 Sb = ["small","medium","large"]; % ...into the order of this text sequence.
 arbsort(Ab,Sb)
 arbsort(Ab,Sb,["tea","coffee"]) % or more sequences.
@@ -65,7 +65,7 @@ arbsort(Ab,Sb,["tea","coffee"]) % or more sequences.
 % # A cell array vector of |N+1| split text parts, i.e. the unmatched text.
 %
 % Note that the function handle is not called with any other inputs, so
-% the function handle must be appropriately parameterized if required
+% the function handle must be appropriately parameterized as required
 % (e.g. for case sensitivity, partial/whole matching, etc.):
 % <https://www.mathworks.com/help/matlab/math/parameterizing-functions.html>.
 %
@@ -85,7 +85,7 @@ arbsort(Ac, @words2num) % download WORDS2NUM from FEX 52925.
 % corresponding replacement text. For example:
 Ad = ["bœuf","bæ","boz","boa","bzz","baa","baz"];
 Rd = ["Æ", "Œ";... row1: match text
-	"AE","OE"]; % row2: replacement text
+     "AE","OE"]; % row2: replacement text
 sort(Ad) % ASCIIbetical
 arbsort(Ad,Rd)
 %% Input 2+: Partial/Whole Text Matching
@@ -121,8 +121,9 @@ arbsort(Ag, 'matchdia')
 %% Input 2+: Literal/Regular Expression Text Matching
 %
 % By default |ARBSORT| treats the sequence text as regular expressions,
-% to allow very compact, powerful sequence definitions. The |'literal'|
-% option can be used to treat the sequence text literally.
+% to allow very compact, powerful sequence definitions (e.g. the pipe
+% operator for defining equivalent characters of an alphabet). The
+% |'literal'| option can be used to treat the sequence text literally.
 Ah = ["_s","s"," s","\s"];
 Sh = ["\s","s"];
 arbsort(Ah,Sh, 'regexp') % default
@@ -138,19 +139,20 @@ Si = ["low","mid","high"];
 %% Output 3: Parsed-Text Array
 %
 % The 3rd output |dbg| is an |RxC| cell array which contains both the
-% matched and split text parts. This cell array is intended for debugging,
-% by visually confirming that the content of |A| is being matched as
-% expected by the provided sequences. The rows of |dbg| are
+% matched and split text parts after text replacement, diacritic removal,
+% and type conversion (functions only). This cell array is intended for
+% debugging, by visually confirming that the content of |A| is being
+% matched as expected by the provided sequences. The rows of |dbg| are
 % <https://www.mathworks.com/company/newsletters/articles/matrix-indexing-in-matlab.html
 % linearly indexed> from the input array |A| (i.e. |R=numel(A)|), the
 % number of columns |C| depends on how many matches were made in the text
-% of array |A|.
+% of array |A| (i.e. depends on the content of |A| and |ARBSORT| options).
 [~,~,dbg] = arbsort(Ai,Si)
 %% Output 4: Sequence Vector
 %
 % The 4th output |seq| is a |1xC| numeric vector indicating which sequence
-% (i.e. input array or function) corresponds to each column of the 3rd
-% output |dbg|, where the values indicate the function input positions
+% text or sequence function corresponds to each column of the 3rd output
+% |dbg|, where the values indicate the function input positions 
 % (e.g. 2 = 2nd input argument). A value of zero indicates that the text
 % in the corresponding column of |dbg| was not matched by any sequence
 % (i.e. the column contains split text).
@@ -166,6 +168,14 @@ alfabeto = num2cell(['A':'N','Ñ','O':'Z']); % Spanish alphabet.
 arbsort(Aj, alfabeto)
 Ak = ["radio", "rana", "rastrillo", "ráfaga", "rápido"];
 arbsort(Ak, alfabeto)
+%% Example: Case-Sensitive Alphabet
+% Specify both upper- and lower-case letters in the alphabet as
+% interleaved pairs ("A","a","B","b", ...), combined with the 'matchcase'
+% option, achieves a case-sensitive sort where uppercase precedes
+% lowercase for the same letter:
+sUL = num2cell('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz');
+Acs = ["bat","Bob","ask","Anna","but","able"]
+arbsort(Acs,sUL,'matchcase')
 %% Example: Alphabet Equivalent Characters
 %
 % The power of regular expressions makes it easy to specify characters
@@ -192,9 +202,10 @@ Ahu = ["apa", "asz", "csak", "cukor", "dzsungel", "dzűmmög", "ár"];
 arbsort(Ahu,abece)
 %% Example: Multiple Sequences
 %
-% Zero or more sequences may be provided. Sequences are matched to text
-% of |A| in the same order as they are provided as inputs to |ARBSORT|.
-% This example uses Swedish weeekday names and the Swedish alphabet:
+% Zero or more sequences may be provided. Sequences are matched to text of
+% |A| in the same order as they are provided as inputs to |ARBSORT|. This
+% example uses Swedish weekday names and the Swedish alphabet: first the
+% weekday names are matched, then anything left over is matched to the alphabet:
 Am = ["ö_Tis", "å_Tis", "a_Tis", "z_Tors", "z_Lör", "ä_Tis", "z_Mån"];
 vardagar = ["Mån(dag)?","Tis(dag)?","Ons(dag)?","Tors(dag)?","Fre(dag)?","Lör(dag)?","Sön(dag)?"]; % weekdays
 alfabet  = num2cell(['A':'Z','ÅÄÖ']); % Swedish alphabet.

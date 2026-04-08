@@ -164,13 +164,13 @@ function [B,ndx,dbg] = natsort(A,rgx,varargin)
 fnh = @(c)cellfun('isclass',c,'char') & cellfun('size',c,1)<2 & cellfun('ndims',c)<3;
 % Release | Feature
 % --------|--------
-% R2007a  | bsxfun
-% R2007b  | regexp/regexpi: cell array of char, once & match & split options
-% R2008a  | assert: message-identifier
-% R2009b  | tilde argument placeholder
-% R2013b  | categorical class                            [only if supplied]
-% R2014b  |    datetime class                            [only if supplied]
 % R2016b  |      string class                            [only if supplied]
+% R2014b  |    datetime class                            [only if supplied]
+% R2013b  | categorical class                            [only if supplied]
+% R2009b  | tilde argument placeholder
+% R2008a  | assert: message-identifier
+% R2007b  | regexp/regexpi: cell array of char, once & match & split options
+% R2007a  | bsxfun
 %
 %% Input Wrangling %%
 %

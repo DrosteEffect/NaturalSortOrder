@@ -5,11 +5,12 @@ function [B,ndx,dbg] = natsortfiles(A,rgx,varargin)
 %
 % Sorts text by character code and by number value. File/folder names, file
 % extensions, and path directories (if supplied) are sorted separately to
-% ensure that shorter names sort before longer names. An example with DIR:
+% ensure that shorter names sort before longer names. The preferred syntax
+% when using DIR is to provide the structure directly to NATSORTFILES:
 %
 %   P = 'C:\SomeDir\SubDir';
 %   S = dir(fullfile(P,'*.txt'));
-%   S = natsortfiles(S);
+%   S = natsortfiles(S);                                       % preferred!
 %   for k = 1:numel(S)
 %       F = fullfile(S(k).folder,S(k).name)
 %       ...
@@ -18,9 +19,8 @@ function [B,ndx,dbg] = natsortfiles(A,rgx,varargin)
 % For names without file extensions (i.e. foldernames, or filenames without
 % extensions) use the 'noext' option. Use the 'xpath' option to ignore the
 % filepath. Use the 'rmdot' option to remove the folder names "." and ".."
-% from the array. Extra optional arguments are passed directly to NATSORT:
-% see NATSORT for case-sensitivity, sort direction, number format matching,
-% and other options.
+% from the array. Any extra optional arguments are passed to NATSORT: see
+% NATSORT for case-sensitivity, sort direction, number format matching, etc.
 %
 %%% Syntax %%%
 %
@@ -140,13 +140,13 @@ function [B,ndx,dbg] = natsortfiles(A,rgx,varargin)
 fnh = @(c)cellfun('isclass',c,'char') & cellfun('size',c,1)<2 & cellfun('ndims',c)<3;
 % Release | Feature
 % --------|--------
-% R2007a  | bsxfun
-% R2007b  | regexp/regexpi: cell array of char, match option
-% R2008a  | assert: message-identifier
-% R2009b  | tilde argument placeholder
+% R2016b  | string class                                 [only if supplied]
 % R2013b  | struct returned by DIR includes a 'folder' field
 %         |     [only relevant when a DIR struct with 'folder' is supplied]
-% R2016b  | string class                                 [only if supplied]
+% R2009b  | tilde argument placeholder
+% R2008a  | assert: message-identifier
+% R2007b  | regexp/regexpi: cell array of char, match option
+% R2007a  | bsxfun
 %
 %% Input Wrangling %%
 %

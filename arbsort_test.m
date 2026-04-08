@@ -5,7 +5,7 @@ function arbsort_test()
 %
 %% Dependencies %%
 %
-% * MATLAB R2017a or later.
+% * MATLAB R2020a or later: <https://www.mathworks.com/help/matlab/matlab_env/script-compatibility-1.html>
 % * arbsort.m & testfun_nso.m from <www.mathworks.com/matlabcentral/fileexchange/132263>
 %
 % See also ARBSORT TEST_NSO_FUN NATSORT_TEST NATSORTFILES_TEST NATSORTROWS_TEST
@@ -212,6 +212,34 @@ chk.i({'9'}).o({'9'})
 %% Non-ASCII %%
 %
 chk.i(["AF","ǣ","ad","Ǣ"], ["Æ|Ǣ";"AE"]).o(["ad","ǣ","Ǣ","AF"])
+%
+%% Dotted İ and Dotless I %%
+%
+% Turkish I-variants:
+%   dotless uppercase I  (U+0049)
+%   dotless lowercase ı  (U+0131)
+%   dotted  uppercase İ  (U+0130)
+%   dotted  lowercase i  (U+0069)
+%
+% With 'ignorecase': {I,ı} fold together and {İ,i} fold together.
+% Alphabet order:    dotless-I < dotted-İ  (as in abc_tr).
+%
+St = num2cell('ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ');
+%
+% Minimal: single-character strings, one of each variant.
+% Expected: dotless pair first {I,ı}, then dotted pair {İ,i},
+%           original order preserved within each pair.
+At = ["İ","I","i","ı"];
+chk.i(At, St, 'ignorecase').o(["I","ı","İ","i"], [2,4,1,3])
+%
+% Word-level: "ırmak"/"Irmak" (dotless) before "ipek"/"İpek" (dotted).
+Bt = ["İpek","ırmak","Irmak","ipek"];
+chk.i(Bt, St, 'ignorecase').o(["ırmak","Irmak","İpek","ipek"], [2,3,1,4])
+%
+% Cross-check with 'matchcase': all four variants are now distinct.
+% Alphabet position: I(10) < İ(11); ı and i are unmatched,
+% so they sort after all matched characters, by character code:
+chk.i(At, St, 'matchcase').o(["I","İ","i","ı"], [2,1,3,4])
 %
 %% Index Stability %%
 %

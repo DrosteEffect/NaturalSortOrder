@@ -196,6 +196,13 @@ categories(P)
 % |NATSORT| parses both the decimal comma and the decimal point, e.g.:
 As = ["1,3", "1,10", "1,2"];
 natsort(As, '\d+,?\d*') % match optional decimal comma
+%% Bonus: Arrays with |ARBSORT|
+%
+% |NATSORT| may be used with
+% <https://www.mathworks.com/matlabcentral/fileexchange/132263 |ARBSORT|>
+% to sort numbers into numeric order and the remaining text with |ARBSORT|:
+Ap = ["Zoë 2";"Zoz 1";"Zoa 2";"Zoë 10";"Zoa 10";"Zoë 1"];
+natsort(Ap, [], @arbsort) % download ARBSORT from FEX 132263.
 %% Bonus: Interactive Regular Expression Tool |IREGEXP|
 %
 % Regular expressions are powerful and compact, but getting them right is

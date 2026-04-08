@@ -6,8 +6,8 @@ This repository is a consolidated mirror and backup of four MATLAB utilities:
 
 - [![View ARBSORT on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/132263) **ARBSORT**
 - [![View NATSORT on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/34464) **NATSORT**
-- [![View NATSORTFILES on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/47434) **NATSORTFILES**
 - [![View NATSORTROWS on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/47433) **NATSORTROWS**
+- [![View NATSORTFILES on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/47434) **NATSORTFILES**
 
 It is intended to keep the functions together with their documentation and test data, under public version control.
 
@@ -30,19 +30,24 @@ All four utilities address limitations of standard ASCIIbetical/lexicographic so
 - Returns the sorted array and a corresponding index vector,
 - Sorting is *stable*, preserving the relative order of elements that compare equal.
 
+### NATSORTROWS ###
+
+`NATSORTROWS` sorts *atomic rows of data* using natural-order rules applied to one or more specified columns.
+
+- Wrapper for `NATSORT`,
+- Designed for tables, timetables, and cell arrays,
+- Allows selection of one or more key columns for sorting.
+
 ### NATSORTFILES ###
 
 `NATSORTFILES` applies natural-order sorting specifically to *filenames* and *filepaths*.
 
 - Wrapper for `NATSORT`,
 - Accepts filenames/paths either:
-  * as a text array (character matrix, cell array of character vectors, string array), or
+  * as a text array (e.g. character matrix, cell array of character vectors, string array), or
   * as the structure returned by `DIR`.
 
-### NATSORTROWS ###
+The preferred approach when calling `DIR` is simply by providing the structure directly as an input argument:
 
-`NATSORTROWS` sorts *atomic rows of data* using natural-order rules applied to one or more specified columns.
-
-- Wrapper for `NATSORT`,
-- Designed for tables and cell arrays,
-- Allows selection of one or more key columns for sorting.
+    S = dir(...);
+    S = natsortfiles(S); % preferred!

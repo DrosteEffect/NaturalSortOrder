@@ -151,6 +151,14 @@ natsortfiles(Aj,'[+-]?\d+\.?\d*') % match decimal fractions.
 % |NATSORTFILES| parses both the decimal comma and the decimal point, e.g.:
 Ak = ["1,3.txt", "1,10.txt", "1,2.txt"];
 natsortfiles(Ak, '\d+,?\d*') % match optional decimal comma
+%% Bonus: Arrays with |ARBSORT|
+%
+% |NATSORT| accepts an optional function handle of a text sorting function,
+% which means |NATSORTFILES| may be used with
+% <https://www.mathworks.com/matlabcentral/fileexchange/132263 |ARBSORT|>
+% to sort numbers into numeric order and the remaining text with |ARBSORT|:
+Ap = ["Zoë 2.txt";"Zoz 1.txt";"Zoa 2";"Zoë 10.txt";"Zoa 10.txt";"Zoë 1.txt"];
+natsortfiles(Ap, [], @arbsort) % download ARBSORT from FEX 132263.
 %% Bonus: Interactive Regular Expression Tool
 %
 % Regular expressions are powerful and compact, but getting them right is
