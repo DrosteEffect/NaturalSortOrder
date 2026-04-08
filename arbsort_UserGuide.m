@@ -122,11 +122,18 @@ arbsort(Ag, 'matchdia')
 %
 % By default |ARBSORT| treats the sequence text as regular expressions,
 % to allow very compact, powerful sequence definitions (e.g. the pipe
-% operator for defining equivalent characters of an alphabet). The
-% |'literal'| option can be used to treat the sequence text literally.
-Ah = ["_s","s"," s","\s"];
-Sh = ["\s","s"];
-arbsort(Ah,Sh, 'regexp') % default
+% operator |'|'| for defining equivalent characters of an alphabet).
+% The |'literal'| option treats the sequence text as plain text instead,
+% which is important whenever the sequence contains regex metacharacters
+% such as |'.'|, |'+'|, |'('|, |')'|, |'['|, or |']'|.
+%
+% In this example the log text contains square brackets. In |'regexp'|
+% mode |[ERROR]| is a _character class_ matching any single character in
+% {E,R,O}, so multiple elements of the sequence will inadvertently match
+% the same text, which throws an error. With |'literal'| the brackets
+% are literal text and each tag matches exactly the requested order:
+Ah = ["[INFO] Started";"[ERROR] Timeout";"[ERROR] High memory";"[ERROR] Disk full";"[INFO] Connected"];
+Sh = ["[ERROR]","[INFO]"];
 arbsort(Ah,Sh, 'literal')
 %% Output 2: Sort Index
 %
