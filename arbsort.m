@@ -84,10 +84,10 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 %   >> Aa = ["Füße", "Fuß", "Für", "Fusion"];
 %   >> Ra = ["ä", "ö", "ü", "ß";... row 1: match text
 %           "ae","oe","ue","ss"]; % row 2: replacement text
-%   >> arbsort(Aa,Ra)                      % DIN 5007 Variante 2
-%   ans = ["Für", "Füße", "Fusion", "Fuß"]
 %   >> arbsort(Aa,["ß";"ss"])              % DIN 5007 Variante 1
 %   ans = ["Für", "Fusion", "Fuß", "Füße"]
+%   >> arbsort(Aa,Ra)                      % DIN 5007 Variante 2
+%   ans = ["Für", "Füße", "Fusion", "Fuß"]
 %
 %% Debugging Output Arrays %%
 %

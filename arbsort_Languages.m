@@ -10,7 +10,7 @@
 % Note: |ARBSORT| does not reproduce every detail of official collation
 % standards, such as complex secondary, tertiary, or contextual rules, or
 % rules based on identifying word roots, etc. For specification-level
-% sorting (e.g. UCA), consider dedicated internationalization tools.
+% sorting (e.g. UCA), consider using dedicated internationalization tools.
 %
 %% |[af] Afrikaans --------------------------------------------- Afrikaans|
 % Setup: the replacement maps both "ŉ" and "'n" to plain "n".
@@ -47,19 +47,21 @@ abc = [num2cell(['A':'Z','ÆØ']),{'Å|AA'}];
 A = ["zone","Aalborg","bane","Ålborg","æble","øre"];
 B = arbsort(A,abc)
 %% |[de] Deutsch -------------------------------------------------- German|
-% Setup: Variante 2 maps "ä"→"ae", "ö"→"oe", "ü"→"ue", "ß"→"ss" via
-% replacements. Variante 1 maps only "ß"→"ss" and relies on the default
-% diacritic removal to map the umlauts to "a", "o", "u" respectively.
-% The two variants yield different orders:
-% Variante 2 gives "Für" < "Füße" < "Fusion" < "Fuß".
-% Variante 1 gives "Für" < "Fusion" < "Fuß" < "Füße".
+% Setup: Variante 1 maps only "ß"→"ss" and relies on the default diacritic
+% removal to map the umlauts "ä", "ö", "ü" to "a", "o", "u" respectively.
+% Variante 2 maps "ä"→"ae", "ö"→"oe", "ü"→"ue", "ß"→"ss" via replacements.
 %
-% Approximation: none.
+% In Austrian German the umlauts "ä", "ö", "ü" are treated as distinct
+% characters and are sorted directly after "a", "o", "u" respectively.
+%
+% Approximation: "ß" is equivalent to "ss", rather than following "ss".
+abc = num2cell(['aä','b':'o','öpqrstuüvwxyz']); % Austrian alphabet
 rpl = ["ä", "ö", "ü", "ß";... row 1: match text
       "ae","oe","ue","ss"]; % row 2: replacement text
-A = ["Füße", "Fuß", "Für", "Fusion"];
-B = arbsort(A,rpl)                                    % DIN 5007 Variante 2
+A = ["Goldmann","Götz","Goethe","Göbel","Göthe"];
+B = arbsort(A,["ß";"ss"],abc)                         % Österreichisch
 B = arbsort(A,["ß";"ss"])                             % DIN 5007 Variante 1
+B = arbsort(A,rpl)                                    % DIN 5007 Variante 2
 %% |[el] Ελληνικά -------------------------------------------------- Greek|
 % Setup: the explicit alphabet covers all 24 Greek letters; accented vowels
 % are handled by the default diacritic removal. The replacement maps final
@@ -67,7 +69,7 @@ B = arbsort(A,["ß";"ss"])                             % DIN 5007 Variante 1
 %
 % Approximation: none.
 rpl = ["ς";"σ"]; % final sigma treated as equivalent to medial sigma
-abc = num2cell('ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ');
+abc = num2cell(['Α':'Ρ','Σ':'Ω']);
 A = ["ωκεανός","αέρας","βιβλίο","μύλοσ","μύλος","ξύλο","ψάρι"];
 B = arbsort(A,rpl,abc)
 %% |[en] English ------------------------------------------------- English|
@@ -95,7 +97,7 @@ B = arbsort(A,abc)
 % the digraph "NG" immediately after "Ñ", both before "O".
 %
 % Approximation: none.
-abc = [num2cell(['A':'M','NÑ']),{'NG'},num2cell('O':'Z')];
+abc = [num2cell('A':'N'),{'Ñ','NG'},num2cell('O':'Z')];
 A = ["nipa","ñoño","ngayon","obra","lupa","mapa"];
 B = arbsort(A,abc)
 %% |[fr] Français ------------------------------------------------- French|
@@ -161,7 +163,7 @@ B = arbsort(A,abc)
 % "Ć", "Ę", "Ł", "Ń", "Ó", "Ś", "Ź", "Ż") at their correct positions.
 %
 % Approximation: none.
-abc = num2cell(['AĄBCĆDEĘ','F':'L','ŁMNŃOÓPQRSŚ','T':'Z','ŹŻ']);
+abc = num2cell('AĄBCĆDEĘFGHIJKLŁMNŃOÓPQRSŚTUVWXYZŹŻ');
 A = ["śnieg","źródło","las","żaba","zero","sól","łódź"];
 B = arbsort(A,abc)
 %% |[pt] Português -------------------------------------------- Portuguese|
@@ -176,7 +178,7 @@ B = arbsort(A)
 % "I", and "Ș" and "Ț" at their correct positions.
 %
 % Approximation: none.
-abc = num2cell(['AĂÂ','B':'I','Î','J':'S','ȘTȚ','U':'Z']);
+abc = num2cell('AĂÂBCDEFGHIÎJKLMNOPQRSȘTȚUVWXYZ');
 A = ["înger","ard","șef","inel","ăsta","țară","stea","ânod"];
 B = arbsort(A,abc)
 %% |[ru] Русский ------------------------------------------------- Russian|
@@ -188,13 +190,12 @@ abc = num2cell('АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮ
 A = ["ёж","ежевика","яблоко","зима","кот","жук"];
 B = arbsort(A,abc)
 %% |[sk] Slovenčina -------------------------------------------- Slovakian|
-% Setup: the explicit alphabet includes the digraphs "DZ" and "DŽ" and
-% the digraph "CH", and places all accented letters at their correct
-% positions.
+% Setup: the explicit alphabet includes the digraphs "DZ", "DŽ", and
+% "CH", and places all accented letters at their correct positions.
 %
 % Approximation: simplified geminates of multigraphs are not split
 % (e.g. "ddz" is not decomposed into "dz"+"dz").
-abc = [num2cell('AÁÄBCČDĎ'),{'DZ','DŽ'},num2cell('EÉFGH'),{'CH'},num2cell('IÍJKLĽĹMNŇOÓÔPQRŔSŠTŤUÚVWXYÝZŽ')];
+abc = [num2cell('AÁÄBCČDĎ'),{'DZ','DŽ','E','É','F','G','H','CH'},num2cell('IÍJKLĽĹMNŇOÓÔPQRŔSŠTŤUÚVWXYÝZŽ')];
 A = ["les","dvor","žena","dzéta","ľud","džem","šunka"];
 B = arbsort(A,abc)
 %% |[sv] Svenska ------------------------------------------------- Swedish|
@@ -235,7 +236,7 @@ B = arbsort(A,abc)
 % variants to their base vowels.
 %
 % Approximation: none.
-abc = num2cell(['aăâbcdđeê','f':'o','ôơ','p':'u','ưvwxyz']);
+abc = num2cell('aăâbcdđeêfghijklmnoôơpqrstuưvwxyz');
 rpl = {... map all tonal variants to their base vowels
     'à|á|ả|ã|ạ','a';
     'ằ|ắ|ẳ|ẵ|ặ','ă';

@@ -51,9 +51,9 @@ arbsort(Aa)
 % character-code> order
 % (by default ignoring any diacritics on the unmatched characters).
 Ab = ["Small Tea";"Medium Coffee";"Large Tea";"Small Coffee";"Medium Tea";"Large Coffee"]; % Array to sort...
-Sb = ["small","medium","large"]; % ...into the order of this text sequence.
-arbsort(Ab,Sb)
-arbsort(Ab,Sb,["tea","coffee"]) % or more sequences.
+Sb = ["small","medium","large"];
+arbsort(Ab,Sb) % ...into the order of one text sequence...
+arbsort(Ab,Sb,["tea","coffee"]) % ... or multiple text sequences.
 %% Input 2+: Sequence Function Handles (e.g. |WORDS2NUM|)
 %
 % A sequence may be specified using a <https://www.mathworks.com/help/matlab/function-handles.html
