@@ -1,7 +1,7 @@
 function [B,ndx,dbg] = natsortfiles(A,rgx,varargin)
 % Natural-order / alphanumeric sort of filenames or foldernames.
 %
-% (c) 2014-2025 Stephen Cobeldick
+% (c) 2014-2026 Stephen Cobeldick
 %
 % Sorts text by character code and by number value. File/folder names, file
 % extensions, and path directories (if supplied) are sorted separately to

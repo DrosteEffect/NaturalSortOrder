@@ -1,7 +1,7 @@
 function [B,ndx,dbg] = natsortrows(A,rgx,varargin)
 % Natural-order / alphanumeric sort the atomic rows of an array.
 %
-% (c) 2014-2025 Stephen Cobeldick
+% (c) 2014-2026 Stephen Cobeldick
 %
 % Sort text by character code and by number value. For a cell/string array:
 % - SORTROWS <column> option is supported, selects the columns to sort by.

@@ -1,7 +1,7 @@
 function [B,ndx,dbg] = natsort(A,rgx,varargin)
 % Natural-order / alphanumeric sort the elements of a text array.
 %
-% (c) 2012-2025 Stephen Cobeldick
+% (c) 2012-2026 Stephen Cobeldick
 %
 % Sorts text by character code and by number value. By default matches
 % integer substrings and performs a case-insensitive ascending sort.
