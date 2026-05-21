@@ -33,31 +33,32 @@ function [B,ndx,dbg] = natsort(A,rgx,varargin)
 %
 % The number substrings are parsed by SSCANF into numeric values, using
 % either the **default format '%f' or the user-supplied format specifier.
-% Both decimal comma and decimal point are accepted in number substrings.
+% Both decimal comma and decimal point are accepted. The '%b' and '%lb'
+% formats use custom bitwise routines rather than a direct SSCANF call.
 %
 % This table shows examples of some regular expression patterns for common
 % notations and ways of writing numbers, together with suitable SSCANF formats:
 %
 % Regular       | Number Substring | Number Substring              | SSCANF
 % Expression:   | Match Examples:  | Match Description:            | Format Specifier:
-% ==============|==================|===============================|==================
-% **        \d+ | 0, 123, 4, 56789 | unsigned integer              | %f  %i  %u  %lu
-% --------------|------------------|-------------------------------|------------------
-%      [+-]?\d+ | +1, 23, -45, 678 | integer with optional +/- sign| %f  %i  %d  %ld
-% --------------|------------------|-------------------------------|------------------
-%     \d+\.?\d* | 012, 3.45, 678.9 | integer or decimal            | %f
-% (\d+|Inf|NaN) | 123, 4, NaN, Inf | integer, Inf, or NaN          | %f
-%  \d+\.\d+E\d+ | 0.123e4, 5.67e08 | exponential notation          | %f
-% --------------|------------------|-------------------------------|------------------
-%  0X[0-9A-F]+  | 0X0, 0X3E7, 0XFF | hexadecimal notation & prefix | %x  %i
-%    [0-9A-F]+  |   0,   3E7,   FF | hexadecimal notation          | %x
-% --------------|------------------|-------------------------------|------------------
-%  0[0-7]+      | 012, 03456, 0700 | octal notation & prefix       | %o  %i
-%   [0-7]+      |  12,  3456,  700 | octal notation                | %o
-% --------------|------------------|-------------------------------|------------------
-%  0B[01]+      | 0B1, 0B101, 0B10 | binary notation & prefix      | %b   (not SSCANF)
-%    [01]+      |   1,   101,   10 | binary notation               | %b   (not SSCANF)
-% --------------|------------------|-------------------------------|------------------
+% ==============|==================|===============================|=====================
+% **        \d+ | 0, 123, 4, 56789 | unsigned whole number         | %f  %u  %lu  %i  %li
+% --------------|------------------|-------------------------------|---------------------
+%      [+-]?\d+ | +1, 23, -45, 678 | whole with optional +/- sign  | %f  %d  %ld  %i  %li
+% --------------|------------------|-------------------------------|---------------------
+%     \d+\.?\d* | 012, 3.45, 678.9 | optional decimal digits       | %f
+% (\d+|Inf|NaN) | 123, 4, NaN, Inf | whole number or Inf or NaN    | %f
+%  \d+E[+-]?\d+ | 123e+004, 567e08 | exponential notation          | %f
+% --------------|------------------|-------------------------------|---------------------
+%  0x[0-9A-F]+  | 0x0, 0x3E7, 0xFF | unsigned hexadecimal & prefix | %x  %lx  %i  %li
+%    [0-9A-F]+  |   0,   3E7,   FF | unsigned hexadecimal          | %x  %lx
+% --------------|------------------|-------------------------------|---------------------
+%  0o[0-7]+     | 0o1, 0o234, 0o07 | unsigned octal & prefix       | %o  %lo  %i  %li
+%    [0-7]+     |   1,   234,   07 | unsigned octal                | %o  %lo
+% --------------|------------------|-------------------------------|---------------------
+%  0b[01]+      | 0b1, 0b101, 0b10 | unsigned binary & prefix      | %b  %lb  (custom)
+%    [01]+      |   1,   101,   10 | unsigned binary               | %b  %lb  (custom)
+% --------------|------------------|-------------------------------|---------------------
 %
 %% Debugging Output Array %%
 %
@@ -130,6 +131,10 @@ function [B,ndx,dbg] = natsort(A,rgx,varargin)
 %%% UINT64 numbers (with full precision):
 % >> natsort({'a18446744073709551615z', 'a18446744073709551614z'}, [], '%lu')
 % ans =       'a18446744073709551614z'  'a18446744073709551615z'
+% >> u64 = intmax('uint64');
+% >> natsort({dec2bin(u64-1,64);dec2bin(u64,64)}, '[01]+', '%lb')
+% ans = '1111111111111111111111111111111111111111111111111111111111111110'
+%       '1111111111111111111111111111111111111111111111111111111111111111'
 %
 %% Input and Output Arguments %%
 %
@@ -144,7 +149,8 @@ function [B,ndx,dbg] = natsort(A,rgx,varargin)
 %     = Character case handling: 'matchcase'/'ignorecase'**
 %     = Character/number order: 'char<num'/'num<char'**
 %     = NaN/number order: 'NaN<num'/'num<NaN'**
-%     = SSCANF conversion format: e.g. '%x', '%li', '%b', '%f'**, etc.
+%     = SSCANF conversion format: e.g. '%x', '%i', '%li', '%f'**, etc.
+%       Binary formats '%lb' (R2012a or later) and '%b' use custom parsing.
 %     = Function handle of a function that sorts text. It must accept one
 %       input, which is a cell array of char vectors (the text array to
 %       be sorted). It must return as its 2nd output the sort indices.
@@ -161,12 +167,13 @@ function [B,ndx,dbg] = natsort(A,rgx,varargin)
 %
 % See also SORT NATSORT_TEST NATSORTFILES NATSORTROWS ARBSORT
 % IREGEXP REGEXP COMPOSE STRING STRINGS CATEGORICAL CELLSTR SSCANF
-fnh = @(c)cellfun('isclass',c,'char') & cellfun('size',c,1)<2 & cellfun('ndims',c)<3;
+fh0 = @(c)cellfun('isclass',c,'char') & cellfun('size',c,1)<2 & cellfun('ndims',c)<3;
 % Release | Feature
 % --------|--------
 % R2016b  |      string class                            [only if supplied]
 % R2014b  |    datetime class                            [only if supplied]
 % R2013b  | categorical class                            [only if supplied]
+% R2012a  | sum(...,'native') option                      [only %lb format]
 % R2009b  | tilde argument placeholder
 % R2008a  | assert: message-identifier
 % R2007b  | regexp/regexpi: cell array of char, once & match & split options
@@ -175,7 +182,7 @@ fnh = @(c)cellfun('isclass',c,'char') & cellfun('size',c,1)<2 & cellfun('ndims',
 %% Input Wrangling %%
 %
 if iscell(A)
-	assert(all(fnh(A(:))),...
+	assert(all(fh0(A(:))),...
 		'SC:natsort:A:CellInvalidContent',...
 		'First input <A> cell array must contain only character row vectors.')
 	C = A(:);
@@ -188,7 +195,7 @@ else % Convert string, categorical, datetime, enumeration, etc.:
 	C = cellstr(A(:));
 end
 %
-chk = '(match|ignore)case|(de|a)scend(ing)?|(char|nan|num)[<>](char|nan|num)|%[a-z]+';
+chk = '(match|ignore)case|(de|a)scend(ing)?|(char|nan|num)[<>](char|nan|num)|%[a-z]{1,2}';
 %
 if nargin<2 || isnumeric(rgx)&&isequal(rgx,[])
 	rgx = '\d+';
@@ -206,7 +213,7 @@ else
 end
 %
 varargin = cellfun(@ns1s2c, varargin, 'UniformOutput',false);
-ixv = fnh(varargin); % char
+ixv = fh0(varargin); % char
 txt = varargin(ixv); % char
 xtx = varargin(~ixv); % not
 %
@@ -223,7 +230,7 @@ ttx = strcmpi(txt,'num<char')|strcmpi(txt,'char>num')|ttn;
 ton = strcmpi(txt,'num>NaN')|strcmpi(txt,'NaN<num');
 tox = strcmpi(txt,'num<NaN')|strcmpi(txt,'NaN>num')|ton;
 % SSCANF format:
-tsf = ~cellfun('isempty',regexp(txt,'^%([bdiuoxfeg]|l[diuox])$'));
+tsf = ~cellfun('isempty',regexp(txt,'^%([efgbdiuox]|l[bdiuox])$'));
 %
 nsAssert(txt, tdx, 'SortDirection', 'sort direction')
 nsAssert(txt, tcx,  'CaseMatching', 'case sensitivity')
@@ -261,16 +268,23 @@ end
 [nbr,spl] = regexpi(C(:), rgx, 'match','split', txt{tcx});
 %
 if numel(nbr)
-	V = [nbr{:}];
-	if strcmp(fmt,'%b')
-		V = regexprep(V,'^0[Bb]','');
-		vec = cellfun(@(s)pow2(numel(s)-1:-1:0)*sscanf(s,'%1d'),V);
-	else
-		vec = sscanf(strrep(sprintf(' %s','0',V{:}),',','.'),fmt);
+	tmp = [nbr{:}];
+	if strcmpi(fmt,'%b') % binary double
+		tmp = regexprep(tmp,'^0[Bb]','');
+		vec = cellfun(@(s)pow2(numel(s)-1:-1:0) * sscanf(s,'%1d'), tmp);
+	elseif strcmpi(fmt,'%lb') % binary uint64
+		tmp = regexprep(tmp,'^0[Bb]','');
+		fh1 = @(d) sum(d .* bitshift(uint64(1), numel(d)-1:-1:0), 'native');
+		vec = cellfun(@(s)fh1(sscanf(s,'%1lu',[1,Inf])), tmp);
+	else % double or uint64
+		if any(strcmpi(fmt,{'%o','%lo','%i','%li'}))
+			tmp = regexprep(tmp,'^0[Oo]','0'); % octal prefix
+		end
+		vec = sscanf(strrep(sprintf(' %s','0',tmp{:}),',','.'),fmt);
 		vec = vec(2:end); % SSCANF wrong data class bug (R2009b and R2010b)
 	end
-	assert(numel(vec)==numel(V),...
-		'SC:natsort:sscanf:TooManyValues',...
+	assert(numel(vec)==numel(tmp),...
+		'SC:natsort:sscanf:ParsedValueMismatch',...
 		'The "%s" format must return one value for each input number.',fmt)
 else
 	vec = [];
@@ -298,10 +312,10 @@ arn(idn) = vec;
 if nargout>2
 	dbg = cell(nmx,0);
 	for k = 1:nmx
-		V = spl{k};
-		V(2,:) = [num2cell(arn(idn(:,k),k));{[]}];
-		V(cellfun('isempty',V)) = [];
-		dbg(k,1:numel(V)) = V;
+		v = spl{k};
+		v(2,:) = [num2cell(arn(idn(:,k),k));{[]}];
+		v(cellfun('isempty',v)) = [];
+		dbg(k,1:numel(v)) = v;
 	end
 end
 %
@@ -313,16 +327,16 @@ end
 %
 if any(ttn) % char<num
 	% Determine max character code:
-	mxc = 'X';
-	tmp = warning('off','all');
-	mxc(1) = Inf;
-	warning(tmp)
-	mxc(mxc==0) = 255; % Octave
+	wrn = warning('off','all');
+	mxc = char(0);
+	mxc(1) = Inf; % MATLAB
+	mxc(~mxc) = 255; % Octave
+	warning(wrn)
 	% Append max character code to the split text:
-	%ars(idn) = strcat(ars(idn),mxc); % slower than loop
 	for ii = reshape(find(idn),1,[])
 		ars{ii}(1,end+1) = mxc;
-	end
+	end % FOR-loop is faster than STRCAT:
+	%ars(idn) = strcat(ars(idn),mxc);
 end
 %
 idn(isnan(arn)) = ~any(ton); % NaN<num

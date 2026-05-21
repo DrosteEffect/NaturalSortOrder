@@ -92,16 +92,19 @@ natsort(Ag, 'NaN|\d+', 'NaN<num')
 %
 % <html>
 % <table>
-%  <tr><th>Format String</th><th>Number Types</th></tr>
-%  <tr><td>%e, %f, %g</td>   <td>floating point numbers</td></tr>
-%  <tr><td>%d</td>           <td>signed integer decimal</td></tr>
-%  <tr><td>%i</td>           <td>signed integer decimal, octal, or hexadecimal</td></tr>
-%  <tr><td>%ld, %li</td>     <td>signed integer 64 bit, decimal, octal, or hexadecimal</td></tr>
-%  <tr><td>%u</td>           <td>unsigned integer decimal</td></tr>
-%  <tr><td>%o</td>           <td>unsigned integer octal</td></tr>
-%  <tr><td>%x</td>           <td>unsigned integer hexadecimal</td></tr>
-%  <tr><td>%lu, %lo, %lx</td><td>unsigned integer 64-bit decimal, octal, or hexadecimal</td></tr>
-%  <tr><td>%b</td>           <td>unsigned binary integer (custom parsing, not SSCANF)</td></tr>
+%  <tr><th>Format String</th><th>Parsed Numbers</th><th>Output Class</th></tr>
+%  <tr><td>%e, %f, %g</td>  <td>decimal floating point numbers</td>       <td>double</td></tr>
+%  <tr><td>%d</td>  <td>signed whole decimal</td>                         <td>double</td></tr>
+%  <tr><td>%i</td>  <td>signed whole decimal or octal or hexadecimal</td> <td>double</td></tr>
+%  <tr><td>%li</td> <td>signed whole decimal or octal or hexadecimal</td> <td> int64</td></tr>
+%  <tr><td>%u</td>  <td>unsigned whole decimal</td>                       <td>double</td></tr>
+%  <tr><td>%lu</td> <td>unsigned whole decimal</td>                       <td>uint64</td></tr>
+%  <tr><td>%o</td>  <td>unsigned whole octal</td>                         <td>double</td></tr>
+%  <tr><td>%lo</td> <td>unsigned whole octal</td>                         <td>uint64</td></tr>
+%  <tr><td>%x</td>  <td>unsigned whole hexadecimal</td>                   <td>double</td></tr>
+%  <tr><td>%lx</td> <td>unsigned whole hexadecimal</td>                   <td>uint64</td></tr>
+%  <tr><td>%b</td>  <td>unsigned whole binary (custom parsing)</td>       <td>double</td></tr>
+%  <tr><td>%lb</td> <td>unsigned whole binary (custom parsing)</td>       <td>uint64</td></tr>
 % </table>
 % </html>
 %
@@ -161,7 +164,12 @@ natsort(An, '[+-]?\d+\.?\d*([eE][+-]?\d+)?')
 % Integers encoded in hexadecimal, octal, or binary may also be parsed and
 % sorted correctly. This requires both an appropriate regular expression
 % to detect the integers and also a suitable |SSCANF| format string for
-% converting the detected number string into numeric:
+% converting the detected number substrings into numeric. The |SSCANF|
+% formats |%i| and |%li| require the use of the data prefix in order to
+% correctly determine the number base. Hexadecimal numbers
+% may use |"0x"| or |"0X"| data prefix. Octal numbers
+% may use |"0o"| or |"0O"| or |"0"| data prefix. Binary numbers
+% may use |"0b"| or |"0B"| data prefix, or none.
 Ao = ["a0X7C4z", "a0X5z", "a0X18z", "a0XFz"];
 sort(Ao) % ASCIIbetical
 natsort(Ao, '0X[0-9A-F]+', '%x') % hexadecimal
