@@ -24,11 +24,10 @@ try words2num('one'); isw=true; catch; isw=false; chk.warn('No WORDS2NUM() found
 %
 %% Mfile Examples %%
 %
-S = ["small","medium","large"];
-A =           ["LargeBurger", "MediumCoffee", "SmallCoffee", "MediumBurger"];
-chk.i(A, S).o(["SmallCoffee"  "MediumBurger"  "MediumCoffee"  "LargeBurger"])
-chk.i(A, S).o(@i, [3,4,2,1]) % not in Mfile
-chk.i(A, S).o(@i, @i, {'Large','Burger';'Medium','Coffee';'Small','Coffee';'Medium','Burger'},[2,0])
+A = ["Tuesday","Friday","Sunday","Monday","Friday"];
+week = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+chk.i(A,week).o(["Monday","Tuesday","Friday","Friday","Sunday"])
+chk.i(A,week).o(@i, [4,1,2,5,3], cellstr(A(:)), 2) % not in Mfile
 %
 alfabeto = num2cell(['A':'N','Ñ','O':'Z']);
 Ae =                  {'yo', 'os', 'la', 'ño', 'va', 'ni', 'de', 'ña'};

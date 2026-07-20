@@ -337,6 +337,8 @@ if any(ttn) % char<num
 		ars{ii}(1,end+1) = mxc;
 	end % FOR-loop is faster than STRCAT:
 	%ars(idn) = strcat(ars(idn),mxc);
+	% MATLAB has no custom comparator, so instead we append the maximum
+	% character code to make text sort before numeric values.
 end
 %
 idn(isnan(arn)) = ~any(ton); % NaN<num

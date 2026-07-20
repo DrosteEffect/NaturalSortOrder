@@ -115,7 +115,8 @@ B = arbsort(A,rpl)
 % are grouped with their base letters using the pipe.
 %
 % Approximation: simplified geminates of multigraphs are not split into
-% the two digraphs (e.g. "nny" is not decomposed into "ny"+"ny").
+% the two digraphs (e.g. "nny" is not decomposed into "ny"+"ny"), as this
+% requires identifying word roots and is beyond the scope of ARBSORT.
 abc = ["a|á","b","c","cs","d","dz","dzs","e|é","f","g","gy","h","i|í","j","k","l","ly","m","n","ny","o|ó","ö|ő","p","q","r","s","sz","t","ty","u|ú","ü|ű","v","w","x","y","z","zs"];
 A = ["ép","sár","csak","szél","dzsem","dal","cukor","dzéta"];
 B = arbsort(A,abc)
@@ -189,12 +190,13 @@ B = arbsort(A,abc)
 abc = num2cell('АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ');
 A = ["ёж","ежевика","яблоко","зима","кот","жук"];
 B = arbsort(A,abc)
-%% |[sk] Slovenčina -------------------------------------------- Slovakian|
+%% |[sk] Slovenčina ----------------------------------------------- Slovak|
 % Setup: the explicit alphabet includes the digraphs "DZ", "DŽ", and
 % "CH", and places all accented letters at their correct positions.
 %
-% Approximation: simplified geminates of multigraphs are not split
-% (e.g. "ddz" is not decomposed into "dz"+"dz").
+% Approximation: simplified geminates of multigraphs are not split into
+% the two digraphs (e.g. "ddz" is not decomposed into "dz"+"dz"), as this
+% requires identifying word roots and is beyond the scope of ARBSORT.
 abc = [num2cell('AÁÄBCČDĎ'),{'DZ','DŽ','E','É','F','G','H','CH'},num2cell('IÍJKLĽĹMNŇOÓÔPQRŔSŠTŤUÚVWXYÝZŽ')];
 A = ["les","dvor","žena","dzéta","ľud","džem","šunka"];
 B = arbsort(A,abc)

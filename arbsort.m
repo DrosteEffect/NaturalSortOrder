@@ -19,20 +19,20 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 %   B = arbsort(A,<options>)
 %   [B,ndx,dbg,seq] = arbsort(A,...)
 %
-% Zero or more sequence function handles, sequence text arrays, and/or
-% replacement text arrays are processed in their input order:
+%%% Example %%%
 %
-%   >> A = ["Large Burger", "Medium Coffee", "Small Coffee", "Medium Burger"];
-%   >> sort(A) % ASCIIbetical
-%   ans =  ["Large Burger"  "Medium Burger"  "Medium Coffee"  "Small Coffee"]
-%   >> arbsort(A, ["small","medium","large"])
-%   ans =  ["Small Coffee"  "Medium Burger"  "Medium Coffee"  "Large Burger"]
-%   >> arbsort(A, ["coffee","burger"],["small","medium","large"])
-%   ans =  ["Small Coffee"  "Medium Coffee"  "Medium Burger"  "Large Burger"]
+% >> A = ["Tuesday","Friday","Sunday","Monday","Friday"];
+% >> week = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+% >> arbsort(A,week)
+% ans = ["Monday"    "Tuesday"    "Friday"    "Friday"    "Sunday"]
+%
+% Zero or more sequence function handles, sequence text arrays, and/or
+% replacement text arrays are processed in their input order.
 %
 % To sort the elements of a string/cell array use NATSORT (File Exchange 34464)
 % To sort the rows of a string/cell/table use NATSORTROWS (File Exchange 47433)
 % To sort any file-names or folder-names use NATSORTFILES (File Exchange 47434)
+% To sort dates, timestamps, or calendar values: use DATETIME() and SORT().
 %
 %% Sequence Text Vector %%
 %
