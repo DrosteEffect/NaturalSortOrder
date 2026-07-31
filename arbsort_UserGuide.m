@@ -50,10 +50,9 @@ arbsort(Aa)
 % <https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html
 % character-code> order
 % (by default ignoring any diacritics on the unmatched characters).
-Ab = ["Small Tea";"Medium Coffee";"Large Tea";"Small Coffee";"Medium Tea";"Large Coffee"]; % Array to sort...
-Sb = ["small","medium","large"];
-arbsort(Ab,Sb) % ...into the order of one text sequence...
-arbsort(Ab,Sb,["tea","coffee"]) % ... or multiple text sequences.
+Ab = ["S_coffee","M_tea","S_tea","L_tea","M_coffee"]; % Array to sort...
+Sb = ["S","M","L"]; %...into the order of one text sequence.
+arbsort(Ab,Sb)
 %% Input 2+: Sequence Function Handles (e.g. |WORDS2NUM|)
 %
 % A sequence may be specified using a <https://www.mathworks.com/help/matlab/function-handles.html
@@ -118,6 +117,15 @@ arbsort(Af,Sf, 'matchcase')
 Ag = ["Zoë","Zoz","Zoa"];
 arbsort(Ag, 'ignoredia') % default
 arbsort(Ag, 'matchdia')
+%% Input 2+: Dictionary Collation vs Sequence Priority
+%
+% By default all sequence matches _and_ also the implicit character-code
+% matches are sorted with equal priority, giving dictionary-like collation.
+% Use option |'seqprio'| to specify that the 1st sequence has highest
+% priority, the 2nd sequence has next priority, etc.:
+arbsort(Ab,["tea","coffee"], 'collate') % default: character code has equal priority
+arbsort(Ab,["tea","coffee"], 'seqprio')
+arbsort(Ab,["tea","coffee"], ["S","M","L"], 'seqprio')
 %% Input 2+: Literal/Regular Expression Text Matching
 %
 % By default |ARBSORT| treats the sequence text as regular expressions,
@@ -210,13 +218,22 @@ arbsort(Ahu,abece)
 %% Example: Multiple Sequences
 %
 % Zero or more sequences may be provided. Sequences are matched to text of
-% |A| in the same order as they are provided as inputs to |ARBSORT|. This
-% example uses Swedish weekday names and the Swedish alphabet: first the
-% weekday names are matched, then anything left over is matched to the alphabet:
+% |A| in exactly the same order as they are provided as inputs to |ARBSORT|.
+% Once text matches any sequence it is not matched to other sequences.
+%
+% This example uses Swedish weekday names and the Swedish alphabet. The
+% weekday names occur after the first letters of the array text, making
+% this a useful example of the difference between |'collate'| and |'seqprio'|:
+%
+% * |'seqprio'| has the highest-priority sequence (vardagar), then the
+%   next priority sequence (alfabet), and finally the implicit char-codes.
+% * |'collate'| treats all atomic matched text and char-code as having
+%   equal sorting priority, giving dictionary-like collation.
 Am = ["ö_Tis", "å_Tis", "a_Tis", "z_Tors", "z_Lör", "ä_Tis", "z_Mån"];
 vardagar = ["Mån(dag)?","Tis(dag)?","Ons(dag)?","Tors(dag)?","Fre(dag)?","Lör(dag)?","Sön(dag)?"]; % weekdays
 alfabet  = num2cell(['A':'Z','ÅÄÖ']); % Swedish alphabet.
-arbsort(Am, vardagar, alfabet) % match weekday names first, then alphabet.
+arbsort(Am, vardagar, alfabet, 'seqprio') % first by weekday sequence, then alphabet.
+arbsort(Am, vardagar, alfabet, 'collate') % left-to-right dictionary-like collation.
 %% Example: Leading/Trailing Whitespace
 %
 % Text that is aligned and padded with whitespace can be sorted e.g. by
@@ -243,7 +260,7 @@ natsortfiles(Ap, [], @arbsort) % download NATSORTFILES from FEX 47434.
 %
 % |ARBSORT| may be used with
 % <https://www.mathworks.com/matlabcentral/fileexchange/47433 |NATSORTROWS|>,
-% e.g. to sort the columns of a table into a arbitrary sequence order. This
+% e.g. to sort the columns of a table into an arbitrary sequence order. This
 % example is from <https://www.excel-easy.com/examples/custom-sort-order.html>
 Tq = readtable('./html/excel-easy.xlsx')
 Fq = @(t)arbsort(t,["HIGH","NORMAL","LOW"]);

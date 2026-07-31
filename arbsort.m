@@ -11,7 +11,7 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 % by default diacritics are removed from characters not matched by any
 % sequence, and by default performs a case-insensitive ascending sort.
 % Optional arguments select the case sensitivity, diacritic sensitivity,
-% literal/regexp interpretation, sort order, etc.
+% literal/regexp interpretation, sort order, match sorting priority etc.
 %
 %%% Syntax %%%
 %
@@ -27,7 +27,19 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 % ans = ["Monday"    "Tuesday"    "Friday"    "Friday"    "Sunday"]
 %
 % Zero or more sequence function handles, sequence text arrays, and/or
-% replacement text arrays are processed in their input order.
+% replacement text array are matched in their input order. Use option
+% 'seqprio' to sort the matched text such that the 1st sequence has highest
+% priority, the 2nd sequence has next priority, etc. The default 'collate'
+% option treats all matched text as having equal priority and sorts using
+% a stable sort (from right to left), giving dictionary collation order.
+%
+% >> Af = ["S_coffee","M_tea","S_tea","L_tea","M_coffee"];
+% >> sml = ["S","M","L"];
+% >> drink = ["tea","coffee"];
+% >> arbsort(Af, drink, sml, 'collate') % default
+% ans = ["S_tea","S_coffee","M_tea","M_coffee","L_tea"]
+% >> arbsort(Af, drink, sml, 'seqprio')
+% ans = ["S_tea","M_tea","L_tea","S_coffee","M_coffee"]
 %
 % To sort the elements of a string/cell array use NATSORT (File Exchange 34464)
 % To sort the rows of a string/cell/table use NATSORTROWS (File Exchange 47433)
@@ -100,28 +112,28 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 % (i.e. input argument position) corresponds to each column of <dbg>
 % (e.g. 2 = 2nd input), and zero indicates that no sequence was matched.
 %
-%   >> [~,~,dbg,seq] = arbsort(A, ["small","medium","large"])
-%   dbg =  {
-%       'Large'     ' Burger'
-%       'Medium'    ' Coffee'
-%       'Small'     ' Coffee'
-%       'Medium'    ' Burger'}
-%   seq =  [  2      0]
+%   >> [~,~,dbg,seq] = arbsort(Af, drink, sml)
+%   dbg = {'S'    '_'    'coffee'
+%          'M'    '_'    'tea'
+%          'S'    '_'    'tea'
+%          'L'    '_'    'tea'
+%          'M'    '_'    'coffee'}
+%   seq = [3      0      2]
 %
 %% Examples %%
 %
 %   >> Ab = {'L', 'XS', 'S', 'M', 'XL', 'S', 'M', 'XL', 'XS', 'L'};
 %   >> [Bb,Xb] = arbsort(Ab, {'XS','S','M','L','XL'})
-%   Bb =  {'XS', 'XS', 'S', 'S', 'M', 'M', 'L', 'L', 'XL', 'XL'}
-%   Xb =  [2,9,3,6,4,7,1,10,5,8]
+%   Bb =    {'XS', 'XS', 'S', 'S', 'M', 'M', 'L', 'L', 'XL', 'XL'}
+%   Xb =    [2,9,3,6,4,7,1,10,5,8]
 %
 %   >> Ac = ["medium_test", "high_train", "low_train", "high_test", "medium_train", "low_test"];
-%   >> arbsort(Ac, ["train","test"], ["low","medium","high"])
-%   ans =  ["low_train", "low_test", "medium_train", "medium_test", "high_train", "high_test"]
+%   >> arbsort(Ac, ["train","test"], ["low","medium","high"], 'seqprio')
+%   ans =   ["low_train", "medium_train", "high_train", "low_test", "medium_test", "high_test"]
 %
 %   >> Ad = ["test_three", "test_one", "test_ninetynine", "test_two"];
 %   >> arbsort(Ad, @words2num) % download WORDS2NUM from FEX 52925.
-%   ans =  ["test_one", "test_two", "test_three", "test_ninetynine"]
+%   ans =   ["test_one", "test_two", "test_three", "test_ninetynine"]
 %
 %% Input Arguments (**=default) %%
 %
@@ -130,6 +142,7 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 %         or any other array type which can be converted by CELLSTR().
 %   <options> can be entered in any order, as many as required:
 %       = Sort direction: 'descend'/'ascend'**
+%       = Sort priority: 'seqprio'/'collate'**
 %       = Character case handling: 'matchcase'/'ignorecase'**
 %       = Text matching interpretation: 'literal'/'regexp'**
 %       = Unmatched diacritics: 'matchdia'/'ignoredia'**
@@ -212,13 +225,17 @@ ixtSqI = strcmpi(varTxt,'regexp')|ixtSqL;
 ixtMaW = strcmpi(varTxt,'whole');
 ixtMaX = strcmpi(varTxt,'partial')|ixtMaW;
 %
+ixtKyS = strcmpi(varTxt,'seqprio');
+ixtKyX = strcmpi(varTxt,'collate')|ixtKyS;
+%
 asAssert(varTxt, ixtDrn,   'SortDirection', 'sort direction')
 asAssert(varTxt, ixtChC,   'CharCaseMatch', 'case sensitivity')
 asAssert(varTxt, ixtDiX,  'DiacriticMatch', 'diacritic sensitivity')
 asAssert(varTxt, ixtSqI, 'LiteralVsRegexp', 'literal vs. regexp interpretation')
 asAssert(varTxt, ixtMaX,  'WholeVsPartial', 'whole vs. partial matching')
+asAssert(varTxt, ixtKyX, 'SortingPriority', 'sequence priority vs collation order')
 %
-ixtXXX = ixtDrn|ixtChC|ixtDiX|ixtSqI|ixtMaX;
+ixtXXX = ixtDrn|ixtChC|ixtDiX|ixtSqI|ixtMaX|ixtKyX;
 if ~all(ixtXXX)
 	errTxt = sprintf(', "%s"',varTxt{~ixtXXX});
 	error('SC:arbsort:InvalidOptions',...
@@ -252,20 +269,20 @@ isDia = any(ixtDiM); % dia
 if any(ixtMaW) % whole
 	fmtMaX = '^(%s)$';
 	isPart = false;
-else % partial match
+else % ** partial match
 	fmtMaX = '(%s)';
 	isPart = true;
 end
 %
 if any(ixtChC) % case
 	optChC = varTxt{ixtChC};
-else
+else % ** ignore case
 	optChC = 'ignorecase';
 end
 %
 if any(ixtDrn) % direction
 	optDrn = varTxt{ixtDrn};
-else
+else % ** ascending
 	optDrn = 'ascend';
 end
 %
@@ -276,8 +293,8 @@ else
 	outCnt = [];
 end
 %
-numCol = size(outArr,2);
 numRow = size(outArr,1);
+numCol = size(outArr,2);
 %
 if nargout>2
 	seq = real(outCnt);
@@ -290,8 +307,25 @@ end
 %% Sort Columns %%
 %
 ndx = 1:numRow;
+unmSeq = -inf(1,numCol);
 %
-for ii = numCol:-1:1
+if any(ixtKyS) % sequence priority
+	keyVec = [0,numel(varXtx):-1:1];
+	idxTmp = cell(size(keyVec));
+	for ii = 1:numel(keyVec)
+		keyCnt = keyVec(ii);
+		idxOut = find(real(outCnt)==keyCnt);
+		idxTmp{ii} = idxOut(end:-1:1);
+		if numel(idxOut) && keyCnt>0 && strcmpi(optDrn,'ascend')
+			unmSeq(idxOut(1)) = Inf;
+		end
+	end
+	idxSrt = [idxTmp{:}];
+else % atomic collation priority
+	idxSrt = numCol:-1:1;
+end
+%
+for ii = idxSrt
 	oneCol = outArr(ndx,ii);
 	if imag(outCnt(ii))>0 % match (function)
 		oneCol(cellfun('isempty',oneCol)) = {NaN};
@@ -304,7 +338,7 @@ for ii = numCol:-1:1
 			varSeq = asIReplace(varSeq,'(',')');
 		end
 		rgxSeq = strcat('^(',varSeq,')$');
-		idxSeq = zeros(size(ndx));
+		idxSeq = repmat(unmSeq(ii),size(ndx));
 		for jj = 1:numRow
 			ixnSeq = find(~cellfun('isempty',regexp(oneCol{jj},rgxSeq,optChC)));
 			switch numel(ixnSeq)

@@ -29,6 +29,18 @@ week = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 chk.i(A,week).o(["Monday","Tuesday","Friday","Friday","Sunday"])
 chk.i(A,week).o(@i, [4,1,2,5,3], cellstr(A(:)), 2) % not in Mfile
 %
+Af = ["S_coffee","M_tea","S_tea","L_tea","M_coffee"];
+sml = ["S","M","L"];
+drink = ["tea","coffee"];
+chk.i(Af, drink, sml, 'collate').o(["S_tea","S_coffee","M_tea","M_coffee","L_tea"])
+chk.i(Af, drink, sml, 'seqprio').o(["S_tea","M_tea","L_tea","S_coffee","M_coffee"])
+chk.i(Af, drink, sml).o(@i, @i, {...
+	'S',    '_',    'coffee';...
+	'M',    '_',    'tea';...
+	'S',    '_',    'tea';...
+	'L',    '_',    'tea';...
+	'M',    '_',    'coffee'}, [3,0,2])
+%
 alfabeto = num2cell(['A':'N','Ñ','O':'Z']);
 Ae =                  {'yo', 'os', 'la', 'ño', 'va', 'ni', 'de', 'ña'};
 chk.i(Ae, alfabeto).o({'de', 'la', 'ni', 'ña', 'ño', 'os', 'va', 'yo'})
@@ -63,10 +75,10 @@ chk.i(Ab, Sb).o(@i, [2,9,3,6,4,7,1,10,5,8]) % not in Mfile
 Sc1 = ["train","test"];
 Sc2 = ["low","medium","high"];
 Dc = {'medium','_','test';'high','_','train';'low','_','train';'high','_','test';'medium','_','train';'low','_','test'};
-Ac =                  ["medium_test", "high_train", "low_train", "high_test", "medium_train", "low_test"];
-chk.i(Ac, Sc1, Sc2).o(["low_train", "low_test", "medium_train", "medium_test", "high_train", "high_test"])
-chk.i(Ac, Sc1, Sc2).o(@i, [3,6,5,1,2,4], Dc, [3,0,2]) % Not in Mfile
-chk.i(Ac, Sc1, Sc2).o(@i, @i, Dc, [3,0,2]) % Not in Mfile
+Ac =                             ["medium_test", "high_train", "low_train", "high_test", "medium_train", "low_test"];
+chk.i(Ac, Sc1, Sc2, 'seqprio').o(["low_train", "medium_train", "high_train", "low_test", "medium_test", "high_test"])
+chk.i(Ac, Sc1, Sc2, 'seqprio').o(@i, [3,5,2,6,1,4], Dc, [3,0,2]) % Not in Mfile
+chk.i(Ac, Sc1, Sc2, 'seqprio').o(@i, @i, Dc, [3,0,2]) % Not in Mfile
 %
 if isw % download WORDS2NUM from FEX 52925.
 	Ad = ["test_three", "test_one", "test_ninetynine", "test_two"];
@@ -85,15 +97,12 @@ chk.i(Aa).o(Ba);
 chk.i(Aa).o(Ba, [3,1,4,2], Da, 0) % not in HTML
 chk.i(Aa).o(@i, [3,1,4,2], Da, 0) % not in HTML
 %
-Ab  = ["SmallTea";"MediumCoffee";"LargeTea";"SmallCoffee";"MediumTea";"LargeCoffee"];
-Sb1 = ["small","medium","large"];
-Sb2 = ["tea","coffee"];
-Ob1 = ["SmallCoffee";"SmallTea";"MediumCoffee";"MediumTea";"LargeCoffee";"LargeTea"];
-Ob2 = ["SmallTea";"SmallCoffee";"MediumTea";"MediumCoffee";"LargeTea";"LargeCoffee"];
-chk.i(Ab,Sb1     ).o(Ob1)
-chk.i(Ab,Sb1     ).o(Ob1,[4;1;2;5;6;3],{'Small','Tea';'Medium','Coffee';'Large','Tea';'Small','Coffee';'Medium','Tea';'Large','Coffee'}, [2,0]) % not in HTML
-chk.i(Ab,Sb1, Sb2).o(Ob2)
-chk.i(Ab,Sb1, Sb2).o(Ob2,[1;4;5;2;3;6],{"Small","Tea";"Medium","Coffee";"Large","Tea";"Small","Coffee";"Medium","Tea";"Large","Coffee"}, [2,3]) % not in HTML
+Ab = ["S_coffee","M_tea","S_tea","L_tea","M_coffee"];
+Sb = ["S","M","L"];
+chk.i(Ab,Sb).o(["S_coffee","S_tea","M_coffee","M_tea","L_tea"])
+chk.i(Ab,["tea","coffee"],     'collate').o(["L_tea", "M_tea", "M_coffee", "S_tea", "S_coffee"])
+chk.i(Ab,["tea","coffee"],     'seqprio').o(["L_tea", "M_tea", "S_tea", "M_coffee", "S_coffee"])
+chk.i(Ab,["tea","coffee"], Sb, 'seqprio').o(["S_tea", "M_tea", "L_tea", "S_coffee", "M_coffee"])
 %
 if isw % download WORDS2NUM from FEX 52925.
 	Ac =                   ["test_one", "test_zero", "test_ninetynine", "test_two"];
@@ -122,7 +131,11 @@ chk.i(Af,Sf, "ignorecase").o(["S", "s", "m", "M", "L", "l"],[1,4,2,6,3,5],{'S';'
 chk.i(Af,Sf,  "matchcase").o(["S", "M", "L", "l", "m", "s"])
 chk.i(Af,Sf,  "matchcase").o(["S", "M", "L", "l", "m", "s"],[1,6,3,5,2,4],{[],'S';'m',[];[],'L';'s',[];'l',[];[],'M'}, [0,2]) % not in HTML
 %
-Ag =                     ["Zoë","Zoz","Zoa"];
+sUL = num2cell('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz');
+Acs = ["bat","Bob","ask","Anna","but","able"];
+chk.i(Acs,sUL,'matchcase').o(["Anna","able","ask","Bob","bat","but"])
+%
+Ag =                     ["Zoë", "Zoz","Zoa"];
 chk.i(Ag, "ignoredia").o(["Zoa", "Zoë", "Zoz"])
 chk.i(Ag, "ignoredia").o(["Zoa", "Zoë", "Zoz"],[3,1,2],{'Zoe';'Zoz';'Zoa'}, 0) % not in HTML
 chk.i(Ag,  "matchdia").o(["Zoa", "Zoz", "Zoë"])
@@ -134,6 +147,10 @@ chk.i(Ah,Sh,  "regexp").o([" s","s","\s","_s"])
 chk.i(Ah,Sh,  "regexp").o([" s","s","\s","_s"],[3,2,4,1],{'_','s',[];[],'s',[];[],' ','s';'\','s',[]}, [0,2,2]) % not in HTML
 chk.i(Ah,Sh, "literal").o(["\s","s"," s","_s"])
 chk.i(Ah,Sh, "literal").o(["\s","s"," s","_s"],[4,2,3,1],{'_','s';[],'s';' ','s';[],'\s'}, [0,2]) % not in HTML
+%
+Ai = ["[INFO] Started";"[ERROR] Timeout";"[ERROR] High memory";"[ERROR] Disk full";"[INFO] Connected"];
+Si = ["[ERROR]","[INFO]"];
+chk.i(Ai,Si,'literal').o(["[ERROR] Disk full";"[ERROR] High memory";"[ERROR] Timeout";"[INFO] Connected";"[INFO] Started"])
 %
 Si = ["low","mid","high"];
 Ai =           ["testHigh","testLow","testMid","testLow"];
@@ -147,7 +164,7 @@ chk.i(Aj, alfabeto).o(["de", "la", "ni", "ña", "ño", "os", "va", "yo"])
 Ak =                  ["radio", "rana", "rastrillo", "ráfaga", "rápido"];
 chk.i(Ak, alfabeto).o(["radio", "ráfaga", "rana", "rápido", "rastrillo"])
 %
-Al =                  ["Bruzn","Bruijn","Bruin","Bruyn","Bruijn"];
+Al =                 ["Bruzn","Bruijn","Bruin","Bruyn","Bruijn"];
 alfabet = [num2cell('A':'Y'),{'Ĳ|IJ','Z'}]; % Winkler Prins
 chk.i(Al, alfabet).o(["Bruin", "Bruyn", "Bruijn", "Bruijn", "Bruzn"])
 chk.i(Al, alfabet).o(["Bruin", "Bruyn", "Bruijn", "Bruijn", "Bruzn"],[3,4,2,5,1]) % not in HTML
@@ -164,8 +181,9 @@ chk.i(Ahu,abece).o(Bhu, [1,7,2,4,3,6,5], {'a','p','a',[],[],[]; 'a','sz',[],[],[
 vardagar = ["Mån(dag)?","Tis(dag)?","Ons(dag)?","Tors(dag)?","Fre(dag)?","Lör(dag)?","Sön(dag)?"];
 alfabet  = num2cell(['A':'Z','ÅÄÖ']); % Swedish alphabet.
 Am =                           ["ö_Tis", "å_Tis", "a_Tis", "z_Tors", "z_Lör", "ä_Tis", "z_Mån"];
-chk.i(Am, vardagar, alfabet).o(["a_Tis", "z_Mån", "z_Tors", "z_Lör", "å_Tis", "ä_Tis", "ö_Tis"])
-chk.i(Am, vardagar, alfabet).o(@i, [3,7,4,5,2,6,1], {...
+chk.i(Am, vardagar, alfabet, 'collate').o(["a_Tis", "z_Mån", "z_Tors", "z_Lör", "å_Tis", "ä_Tis", "ö_Tis"])
+chk.i(Am, vardagar, alfabet, 'seqprio').o(["z_Mån", "a_Tis", "å_Tis", "ä_Tis", "ö_Tis", "z_Tors", "z_Lör"])
+chk.i(Am, vardagar, alfabet, 'seqprio').o(@i, [7,3,2,6,1,4,5], {...
 	'ö','_','Tis' ;...
 	'å','_','Tis' ;...
 	'a','_','Tis' ;...
