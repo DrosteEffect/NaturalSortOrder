@@ -164,13 +164,16 @@ chk.i(Aj, alfabeto).o(["de", "la", "ni", "ña", "ño", "os", "va", "yo"])
 Ak =                  ["radio", "rana", "rastrillo", "ráfaga", "rápido"];
 chk.i(Ak, alfabeto).o(["radio", "ráfaga", "rana", "rápido", "rastrillo"])
 %
-Al =                 ["Bruzn","Bruijn","Bruin","Bruyn","Bruijn"];
+Al =                 ["Bruĳn", "Bruzn", "Bruin", "Bruyn", "Bruxn", "Bruijn"];
 alfabet = [num2cell('A':'Y'),{'Ĳ|IJ','Z'}]; % Winkler Prins
-chk.i(Al, alfabet).o(["Bruin", "Bruyn", "Bruijn", "Bruijn", "Bruzn"])
-chk.i(Al, alfabet).o(["Bruin", "Bruyn", "Bruijn", "Bruijn", "Bruzn"],[3,4,2,5,1]) % not in HTML
+chk.i(Al, alfabet).o(["Bruin", "Bruxn", "Bruyn", "Bruĳn", "Bruijn", "Bruzn"])
+chk.i(Al, alfabet).o(["Bruin", "Bruxn", "Bruyn", "Bruĳn", "Bruijn", "Bruzn"],[3,5,4,1,6,2]) % not in HTML
 alfabet = [num2cell('A':'X'),{'Ĳ|IJ|Y','Z'}]; % telephone
-chk.i(Al, alfabet).o(["Bruin", "Bruijn", "Bruyn", "Bruijn", "Bruzn"])
-chk.i(Al, alfabet).o(["Bruin", "Bruijn", "Bruyn", "Bruijn", "Bruzn"],[3,2,4,5,1]) % not in HTML
+chk.i(Al, alfabet).o(["Bruin", "Bruxn", "Bruĳn", "Bruyn", "Bruijn", "Bruzn"])
+chk.i(Al, alfabet).o(["Bruin", "Bruxn", "Bruĳn", "Bruyn", "Bruijn", "Bruzn"],[3,5,1,4,6,2]) % not in HTML
+Rl = ["Ĳ";"IJ"]; % "Ĳ" -> "I" & "J"
+chk.i(Al, Rl).o(     ["Bruĳn", "Bruijn", "Bruin", "Bruxn", "Bruyn", "Bruzn"])
+chk.i(Al, Rl).o(     ["Bruĳn", "Bruijn", "Bruin", "Bruxn", "Bruyn", "Bruzn"],[1,6,3,5,4,2]) % not in HTML
 %
 abece = ["a|á","b","c","cs","d","dz","dzs","e|é","f","g","gy","h","i|í","j","k","l","ly","m","n","ny","o|ó","ö|ő","p","q","r","s","sz","t","ty","u|ú","ü|ű","v","w","x","y","z","zs"];
 Ahu = ["apa", "asz", "csak", "cukor", "dzsungel", "dzűmmög", "ár"];

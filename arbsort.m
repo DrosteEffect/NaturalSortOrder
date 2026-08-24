@@ -7,7 +7,7 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 %
 % Sorts text array <A> into the order of custom/arbitrary text sequences.
 % Matched (sub-)text within <A> is used to sort the elements of <A> using
-% the sequence order, remaining text is sorted into character code order:
+% the sequence order, remaining text is sorted into character-code order:
 % by default diacritics are removed from characters not matched by any
 % sequence, and by default performs a case-insensitive ascending sort.
 % Optional arguments select the case sensitivity, diacritic sensitivity,
@@ -30,7 +30,8 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 % replacement text array are matched in their input order. Use option
 % 'seqprio' to sort the matched text such that the 1st sequence has highest
 % priority, the 2nd sequence has next priority, etc. The default 'collate'
-% option treats all matched text as having equal priority and sorts using
+% option gives equal priority to matched text and unmatched text, and
+% sorts them based on _where_ they occur within the input text. It uses
 % a stable sort (from right to left), giving dictionary collation order.
 %
 % >> Af = ["S_coffee","M_tea","S_tea","L_tea","M_coffee"];
@@ -54,7 +55,9 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 % By default sequences are interpreted as regular expressions, allowing
 % powerful compact sequences, e.g. ["S(mall)?","M(edium)?","L(arge)?"],
 % which also makes it easy to define characters as equivalent, e.g. "Å|AA".
-% The option "literal" selects to interpret sequences literally. See also:
+% The option "literal" selects to interpret sequences literally.
+% Each matched text must match exactly one sequence element, otherwise
+% its position in the sequence would be ambiguous. See also:
 % <https://www.mathworks.com/help/matlab/matlab_prog/regular-expressions.html>
 %
 % Many languages do not sort correctly when sorted into ASCII/Unicode
@@ -142,11 +145,11 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 %         or any other array type which can be converted by CELLSTR().
 %   <options> can be entered in any order, as many as required:
 %       = Sort direction: 'descend'/'ascend'**
-%       = Sort priority: 'seqprio'/'collate'**
 %       = Character case handling: 'matchcase'/'ignorecase'**
 %       = Text matching interpretation: 'literal'/'regexp'**
 %       = Unmatched diacritics: 'matchdia'/'ignoredia'**
 %       = Sequence matching in <A>: 'whole'/'partial'**
+%       = Sequence priority: 'seqprio'/'collate'**
 %       = Sequence function handle, which converts a string scalar or char
 %         vector to numeric. It must return the following two outputs:
 %         1: a numeric vector corresponding to the matched text parts,
@@ -159,7 +162,7 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 %
 % Note1: by default both sequence text and replacement text are regular
 % expressions: use the sequence interpretation option for literal text.
-% Note2: character codes 0:3 are reserved for internal use.
+% Note2: character-codes 0:3 are reserved for internal use.
 %
 %% Output Arguments %%
 %
@@ -204,7 +207,7 @@ else % Convert string, categorical, datetime, enumeration, etc.:
 end
 assert(all([C{:}]>3),...
 	'SC:arbsort:A:ControlChars',...
-	'First input <A> must contain only character codes >3.')
+	'First input <A> must contain only character-codes >3.')
 %
 varargin = cellfun(@as1s2c, varargin, 'UniformOutput',false);
 idxTxt = fnh(varargin); % is char
@@ -228,12 +231,12 @@ ixtMaX = strcmpi(varTxt,'partial')|ixtMaW;
 ixtKyS = strcmpi(varTxt,'seqprio');
 ixtKyX = strcmpi(varTxt,'collate')|ixtKyS;
 %
-asAssert(varTxt, ixtDrn,   'SortDirection', 'sort direction')
-asAssert(varTxt, ixtChC,   'CharCaseMatch', 'case sensitivity')
-asAssert(varTxt, ixtDiX,  'DiacriticMatch', 'diacritic sensitivity')
-asAssert(varTxt, ixtSqI, 'LiteralVsRegexp', 'literal vs. regexp interpretation')
-asAssert(varTxt, ixtMaX,  'WholeVsPartial', 'whole vs. partial matching')
-asAssert(varTxt, ixtKyX, 'SortingPriority', 'sequence priority vs collation order')
+asAssert(varTxt, ixtDrn,    'SortDirection', 'sort direction')
+asAssert(varTxt, ixtChC,    'CharCaseMatch', 'case sensitivity')
+asAssert(varTxt, ixtDiX,   'DiacriticMatch', 'diacritic sensitivity')
+asAssert(varTxt, ixtSqI,  'LiteralVsRegexp', 'literal vs. regexp interpretation')
+asAssert(varTxt, ixtMaX,   'WholeVsPartial', 'whole vs. partial matching')
+asAssert(varTxt, ixtKyX, 'SequencePriority', 'sequence priority vs collation order')
 %
 ixtXXX = ixtDrn|ixtChC|ixtDiX|ixtSqI|ixtMaX|ixtKyX;
 if ~all(ixtXXX)

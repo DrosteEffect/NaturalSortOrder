@@ -21,7 +21,7 @@
 % Note that MATLAB's inbuilt
 % <https://www.mathworks.com/help/matlab/ref/sort.html |SORT|> function
 % sorts text by <https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html
-% character code>, as does |SORT| in most programming languages.
+% character-code>, as does |SORT| in most programming languages.
 %
 % Other useful text sorting functions:
 %
@@ -92,8 +92,9 @@ arbsort(Ad,Rd)
 % By default |ARBSORT| performs partial text matches, i.e. _parts_ of the
 % text in |A| can match the sequence text. Specify the |'whole'| option
 % to match only the _complete_ elements of |A| to the sequence text.
-% Note that matched text is sorted before unmatched text, and unmatched
-% text is sorted into character code order.
+%
+% Note that matched text is sorted into the order of the provided
+% sequences, whereas unmatched text is sorted into character-code order.
 Ae = ["S", "Medium", "L", "Small", "Large", "M"];
 Se = ["S","M","L"];
 arbsort(Ae,Se, 'partial') % default
@@ -113,17 +114,22 @@ arbsort(Af,Sf, 'matchcase')
 % just before sorting. This suits common practice in many languages, where
 % diacritics (that might not be defined in that language) are ignored when
 % sorting text. The |'matchdia'| option is used to sort letters (complete
-% with diacritics) into character code order:
+% with diacritics) into character-code order:
 Ag = ["Zoë","Zoz","Zoa"];
 arbsort(Ag, 'ignoredia') % default
 arbsort(Ag, 'matchdia')
 %% Input 2+: Dictionary Collation vs Sequence Priority
 %
-% By default all sequence matches _and_ also the implicit character-code
-% matches are sorted with equal priority, giving dictionary-like collation.
-% Use option |'seqprio'| to specify that the 1st sequence has highest
-% priority, the 2nd sequence has next priority, etc.:
-arbsort(Ab,["tea","coffee"], 'collate') % default: character code has equal priority
+% By default all sequence matches and unmatched text are sorted with the
+% highest priority at the start of each character vector and lowest at the
+% end, thus giving dictionary-like collation (i.e. option |'collate'|).
+% In other words, all matches and character-codes have equal weighting,
+% their sorting priority depends solely on _where_ they occur in the text.
+%
+% Use option |'seqprio'| to instead give the 1st sequence the highest
+% priority, the 2nd sequence next priority, etc. Any unmatched text is
+% used as the lowest priority tie-breaker using character-codes.
+arbsort(Ab,["tea","coffee"], 'collate') % default: character-code has equal priority
 arbsort(Ab,["tea","coffee"], 'seqprio')
 arbsort(Ab,["tea","coffee"], ["S","M","L"], 'seqprio')
 %% Input 2+: Literal/Regular Expression Text Matching
@@ -134,6 +140,10 @@ arbsort(Ab,["tea","coffee"], ["S","M","L"], 'seqprio')
 % The |'literal'| option treats the sequence text as plain text instead,
 % which is important whenever the sequence contains regex metacharacters
 % such as |'.'|, |'+'|, |'('|, |')'|, |'['|, or |']'|.
+%
+% Each matched text must match exactly one element of the sequence:
+% |ARBSORT| throws an error if multiple sequence elements match the same
+% text, because its position within the sequence would be ambiguous.
 %
 % In this example the log text contains square brackets. In |'regexp'|
 % mode |[ERROR]| is a _character class_ matching any single character in
@@ -167,7 +177,7 @@ Si = ["low","mid","high"];
 %
 % The 4th output |seq| is a |1xC| numeric vector indicating which sequence
 % text or sequence function corresponds to each column of the 3rd output
-% |dbg|, where the values indicate the function input positions 
+% |dbg|, where the values indicate the function input positions
 % (e.g. 2 = 2nd input argument). A value of zero indicates that the text
 % in the corresponding column of |dbg| was not matched by any sequence
 % (i.e. the column contains split text).
@@ -184,9 +194,10 @@ arbsort(Aj, alfabeto)
 Ak = ["radio", "rana", "rastrillo", "ráfaga", "rápido"];
 arbsort(Ak, alfabeto)
 %% Example: Case-Sensitive Alphabet
+%
 % Specify both upper- and lower-case letters in the alphabet as
 % interleaved pairs ("A","a","B","b", ...), combined with the 'matchcase'
-% option, achieves a case-sensitive sort where uppercase precedes
+% option, e.g. to achieve a case-sensitive sort where uppercase precedes
 % lowercase for the same letter:
 sUL = num2cell('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz');
 Acs = ["bat","Bob","ask","Anna","but","able"]
@@ -195,23 +206,27 @@ arbsort(Acs,sUL,'matchcase')
 %
 % The power of regular expressions makes it easy to specify characters
 % that are equivalent to each other. For example, the Dutch digraph "ij"
-% (sometimes written using the ligature "ĳ") sorts either
+% (sometimes written using the ligature "ĳ") sorts:
 %
-% * between 'y' and 'z' (Winkler Prins order), or
-% * equivalent to 'y' (telephone directory order).
-%
-% Both of these are easy to achieve (as two characters or ligature):
-Al = ["Bruzn","Bruijn","Bruin","Bruyn","Bruijn"];
+% # between 'y' and 'z' (Winkler Prins order), or
+% # equivalent to 'y' (telephone directory order), or
+% # by treating the ligature "Ĳ" as two letters "I" and "J".
+Al = ["Bruĳn","Bruzn","Bruin","Bruyn","Bruxn","Bruijn"];
 alfabet = [num2cell('A':'Y'),{'Ĳ|IJ','Z'}]; % Winkler Prins
 arbsort(Al, alfabet)
 alfabet = [num2cell('A':'X'),{'Ĳ|IJ|Y','Z'}]; % telephone
 arbsort(Al, alfabet)
+Rl = ["Ĳ";"IJ"]; % "Ĳ" -> "I" & "J"
+arbsort(Al,Rl)
 %% Example: Digraphs and Trigraphs
 %
-% Digraphs and trigraphs may be defined as part of the final alphabet 
-% sequence. For example, Hungarian defines 'cs', 'dz', 'dzs' and various 
-% other digraphs as letters of the alphabet. Reminder: my simple |ARBSORT|
-% does not detect word roots, duplicated digraphs/trigraphs, etc.
+% Digraphs and trigraphs may be defined as part of the final alphabet
+% sequence. |ARBSORT| ensures that longer sequence expressions match
+% first: for example it attempts matching Hungarian "dzs" before "dz",
+% and "dz" before "d".
+%
+% Reminder: my simple |ARBSORT| algorithm does *not* detect word roots,
+% duplicated digraphs/trigraphs, etc.
 abece = ["a|á","b","c","cs","d","dz","dzs","e|é","f","g","gy","h","i|í","j","k","l","ly","m","n","ny","o|ó","ö|ő","p","q","r","s","sz","t","ty","u|ú","ü|ű","v","w","x","y","z","zs"];
 Ahu = ["apa", "asz", "csak", "cukor", "dzsungel", "dzűmmög", "ár"];
 arbsort(Ahu,abece)
@@ -225,15 +240,17 @@ arbsort(Ahu,abece)
 % weekday names occur after the first letters of the array text, making
 % this a useful example of the difference between |'collate'| and |'seqprio'|:
 %
-% * |'seqprio'| has the highest-priority sequence (vardagar), then the
-%   next priority sequence (alfabet), and finally the implicit char-codes.
-% * |'collate'| treats all atomic matched text and char-code as having
-%   equal sorting priority, giving dictionary-like collation.
+% * |'seqprio'| gives highest priority to the 1st sequence (vardagar),
+%   the next priority to the 2nd sequence (alfabet), and lowest priority
+%   to any unmatched text which is sorted into character-code order.
+% * |'collate'| treats all matched text and unmatched text (i.e. character
+%   codes) as having equal sorting priority, and sorts them based on their
+%   position within the input text. This gives dictionary-like collation.
 Am = ["ö_Tis", "å_Tis", "a_Tis", "z_Tors", "z_Lör", "ä_Tis", "z_Mån"];
 vardagar = ["Mån(dag)?","Tis(dag)?","Ons(dag)?","Tors(dag)?","Fre(dag)?","Lör(dag)?","Sön(dag)?"]; % weekdays
 alfabet  = num2cell(['A':'Z','ÅÄÖ']); % Swedish alphabet.
-arbsort(Am, vardagar, alfabet, 'seqprio') % first by weekday sequence, then alphabet.
-arbsort(Am, vardagar, alfabet, 'collate') % left-to-right dictionary-like collation.
+arbsort(Am, vardagar, alfabet, 'seqprio') % priority depends on sequence input order.
+arbsort(Am, vardagar, alfabet, 'collate') % priority depends on match position.
 %% Example: Leading/Trailing Whitespace
 %
 % Text that is aligned and padded with whitespace can be sorted e.g. by
