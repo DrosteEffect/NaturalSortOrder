@@ -1,5 +1,9 @@
 %% |ARBSORT| Language Examples
 %
+% The function <https://www.mathworks.com/matlabcentral/fileexchange/132263
+% |ARBSORT|> sorts the elements of the input array |A| into the order
+% of the provided custom/arbitrary text sequences (aka _custom lists_).
+%
 % This script showcases how |ARBSORT| can _improve_ sorting for various
 % languages via user-specified alphabets, character replacements, and the
 % default diacritic removal. For many languages these are improvements
@@ -14,7 +18,6 @@
 %
 %% |[af] Afrikaans --------------------------------------------- Afrikaans|
 % Setup: the replacement maps both "ŉ" and "'n" to plain "n".
-% Distinctions: "ŉ" ≡ "'n" (both sort as "n").
 %
 % Approximation: the CLDR tertiary rule placing "'n" after all "N" words
 % is not reproduced; both forms sort identically as plain "n".
@@ -25,7 +28,7 @@ B = arbsort(A,rpl)
 % Setup: the explicit alphabet places "Ə" immediately after "E",
 % "X" between "H" and "I", and keeps dotless "I" before dotted "İ".
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = num2cell('ABCÇDEƏFGĞHXIİJKQLMNOÖPRSŞTUÜVYZ');
 A = ["xətt","ev","ip","həm","əmək","ışıq"];
 B = arbsort(A,abc)
@@ -33,7 +36,7 @@ B = arbsort(A,abc)
 % Setup: the explicit alphabet includes the digraph "CH" as a single
 % letter immediately following "H".
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = [num2cell('AÁBCČDĎEÉĚFGH'),{'CH'},num2cell('IÍJKLMNŇOÓPQRŘSŠTŤUÚŮVWXYÝZŽ')];
 A = ["ruka","hora","čas","chyba","cena","řeka"];
 B = arbsort(A,abc)
@@ -67,7 +70,7 @@ B = arbsort(A,rpl)                                    % DIN 5007 Variante 2
 % are handled by the default diacritic removal. The replacement maps final
 % sigma "ς" to medial sigma "σ", so that they sort identically.
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 rpl = ["ς";"σ"]; % final sigma treated as equivalent to medial sigma
 abc = num2cell(['Α':'Ρ','Σ':'Ω']);
 A = ["ωκεανός","αέρας","βιβλίο","μύλοσ","μύλος","ξύλο","ψάρι"];
@@ -75,20 +78,20 @@ B = arbsort(A,rpl,abc)
 %% |[en] English ------------------------------------------------- English|
 % Setup: uses |ARBSORT|'s default diacritic removal.
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 A = ["Rosé","Rosy","Rosa","Rose"];
 B = arbsort(A)
 %% |[es] Español ------------------------------------------------- Spanish|
 % Setup: the explicit alphabet inserts "Ñ" between "N" and "O".
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = num2cell(['A':'N','Ñ','O':'Z']);
 A = ["ñu","oro","nube","campo","ñame","lima"];
 B = arbsort(A,abc)
 %% |[fi] Suomi --------------------------------------------------- Finnish|
 % Setup: the explicit alphabet places "Å", "Ä", and "Ö" after "Z".
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = num2cell(['A':'Z','ÅÄÖ']);
 A = ["talo","aalto","zebra","tähti","Åland","äiti","öljy"];
 B = arbsort(A,abc)
@@ -96,7 +99,7 @@ B = arbsort(A,abc)
 % Setup: the explicit alphabet places "Ñ" immediately after "N" and
 % the digraph "NG" immediately after "Ñ", both before "O".
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = [num2cell('A':'N'),{'Ñ','NG'},num2cell('O':'Z')];
 A = ["nipa","ñoño","ngayon","obra","lupa","mapa"];
 B = arbsort(A,abc)
@@ -124,27 +127,27 @@ B = arbsort(A,abc)
 % Setup: uses the default |ARBSORT| behaviour; the standard 26-letter
 % Latin alphabet requires no special configuration.
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 A = ["udara","nasi","mobil","buku","ikan","zakat","dari"];
 B = arbsort(A)
 %% |[it] Italiano ------------------------------------------------ Italian|
 % Setup: uses the default |ARBSORT| behaviour; accented vowels are
 % handled by the default diacritic removal.
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 A = ["tè","sole","là","voglio","la","te"];
 B = arbsort(A)
 %% |[ms] Bahasa Melayu --------------------------------------------- Malay|
 % Setup: uses the default |ARBSORT| behaviour; the standard 26-letter
 % Latin alphabet requires no special configuration.
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 A = ["ubat","meja","buku","kita","air","zaman","dari"];
 B = arbsort(A)
 %% |[nb] Norsk Bokmål ------------------------------------------ Norwegian|
 % Setup: the explicit alphabet places "Æ", "Ø", and "Å" after "Z".
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = num2cell(['A':'Z','ÆØÅ']);
 A = ["øre","ærlig","bane","ånd","aal","zebra","elg"];
 B = arbsort(A,abc)
@@ -169,7 +172,7 @@ B = arbsort(A,rpl)
 % Setup: the explicit alphabet places all Polish special letters ("Ą",
 % "Ć", "Ę", "Ł", "Ń", "Ó", "Ś", "Ź", "Ż") at their correct positions.
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = num2cell('AĄBCĆDEĘFGHIJKLŁMNŃOÓPQRSŚTUVWXYZŹŻ');
 A = ["śnieg","źródło","las","żaba","zero","sól","łódź"];
 B = arbsort(A,abc)
@@ -177,14 +180,14 @@ B = arbsort(A,abc)
 % Setup: uses the default |ARBSORT| behaviour; diacritics are handled
 % by the default diacritic removal.
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 A = ["maça","maçã","maca","caju","café","bola","ação"];
 B = arbsort(A)
 %% |[ro] Română ------------------------------------------------- Romanian|
 % Setup: the explicit alphabet places "Ă" and "Â" after "A", "Î" after
 % "I", and "Ș" and "Ț" at their correct positions.
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = num2cell('AĂÂBCDEFGHIÎJKLMNOPQRSȘTȚUVWXYZ');
 A = ["înger","ard","șef","inel","ăsta","țară","stea","ânod"];
 B = arbsort(A,abc)
@@ -192,7 +195,7 @@ B = arbsort(A,abc)
 % Setup: the explicit Cyrillic alphabet places "Ё" immediately after
 % "Е"; without it, the default diacritic removal would fold "Ё" into "Е".
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = num2cell('АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ');
 A = ["ёж","ежевика","яблоко","зима","кот","жук"];
 B = arbsort(A,abc)
@@ -209,7 +212,7 @@ B = arbsort(A,abc)
 %% |[sv] Svenska ------------------------------------------------- Swedish|
 % Setup: the explicit alphabet places "Å", "Ä", and "Ö" after "Z".
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = num2cell(['A':'Z','ÅÄÖ']);
 A = ["zon","bal","äpple","öl","åka","zäta","bana"];
 B = arbsort(A,abc)
@@ -217,7 +220,7 @@ B = arbsort(A,abc)
 % Setup: uses the default |ARBSORT| behaviour; the standard 26-letter
 % Latin alphabet requires no special configuration.
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 A = ["ngoma","nyumba","mbu","rafiki","zebra"];
 B = arbsort(A)
 %% |[tr] Türkçe -------------------------------------------------- Turkish|
@@ -225,7 +228,7 @@ B = arbsort(A)
 % "ırmak" correctly precedes "ipek". Without it, Unicode character-code
 % order would incorrectly place dotted "i" before dotless "ı".
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = num2cell('ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ');
 A = ["gülşen","zorlu","ırmak","ipek","gazi","ömer"];
 B = arbsort(A,abc)
@@ -234,7 +237,7 @@ B = arbsort(A,abc)
 % "Є" from "Е", and "Ї" from "І"; without it, these pairs would merge
 % or sort incorrectly under Unicode order.
 %
-% Approximation: none for the collation being demonstrated.
+% Approximation: no known limitation affects the ordering shown.
 abc = num2cell('АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ');
 A = ["яб","гора","ґанок","єд","зима","їжак","іній","ера"];
 B = arbsort(A,abc)

@@ -1,5 +1,7 @@
 %% |ARBSORT| User Guide
 %
+% GitHub: <https://github.com/DrosteEffect/NaturalSortOrder>
+%
 % The function <https://www.mathworks.com/matlabcentral/fileexchange/132263
 % |ARBSORT|> sorts the elements of the input array |A| into the order
 % of the provided custom/arbitrary text sequences (aka _custom lists_).
@@ -22,15 +24,6 @@
 % <https://www.mathworks.com/help/matlab/ref/sort.html |SORT|> function
 % sorts text by <https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html
 % character-code>, as does |SORT| in most programming languages.
-%
-% Other useful text sorting functions:
-%
-% * Natural order sort of filenames, foldernames, and filepaths:
-% <https://www.mathworks.com/matlabcentral/fileexchange/47434 |NATSORTFILES|>
-% * Natural order sort the rows of a string/cell/table/etc array:
-% <https://www.mathworks.com/matlabcentral/fileexchange/47433 |NATSORTROWS|>
-% * Natural order sort of text in a string/cell/categorical array:
-% <https://www.mathworks.com/matlabcentral/fileexchange/34464 |NATSORT|>
 %
 %% Basic Usage: Ignore Diacritics
 %
@@ -291,3 +284,26 @@ natsortrows(Tq, [], 'Priority', Fq)
 % <https://www.mathworks.com/help/matlab/ref/regexp.html |REGEXP|>'s
 % outputs displayed and updated as you type:
 iregexp('x123y456789z','(\d)(\d*)') % download IREGEXP from FEX 48930.
+%% Performance Example
+%
+% The log-log plot shows the execution time of |ARBSORT| for increasing
+% numbers of input elements, using the same randomly generated text for
+% both tests. The default call performs diacritic removal, whereas the
+% Czech-alphabet call additionally matches the text against an explicit
+% alphabet containing accented letters and the digraph "CH".
+S = load('arbsort_Benchmark.mat');
+loglog(S.sizes,S.secondsDefault,'o-',S.sizes,S.secondsCzech,'o-')
+xlabel('Number of Elements')
+ylabel('Elapsed Time (Seconds)')
+legend('Default Diacritic Removal','Czech Alphabet','Location','northwest')
+grid on
+%% See Also
+%
+% * Natural order sort of filenames, foldernames, and filepaths:
+%   <https://www.mathworks.com/matlabcentral/fileexchange/47434 |NATSORTFILES|>
+% * Natural order sort the rows of a string/cell/table/etc array:
+%   <https://www.mathworks.com/matlabcentral/fileexchange/47433 |NATSORTROWS|>
+% * Natural order sort of text in a string/cell/categorical array:
+%   <https://www.mathworks.com/matlabcentral/fileexchange/34464 |NATSORT|>
+%
+% Note: both |NATSORTFILES| and |NATSORTROWS| call |NATSORT|.

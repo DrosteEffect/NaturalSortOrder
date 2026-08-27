@@ -33,6 +33,7 @@ function [B,ndx,dbg] = natsortrows(A,rgx,varargin)
 % To sort the elements of a string/cell array use NATSORT (File Exchange 34464)
 % To sort any file-names or folder-names use NATSORTFILES (File Exchange 47434)
 % To sort string/cells using custom sequences use ARBSORT (File Exchange 132263)
+% GitHub repository: <https://github.com/DrosteEffect/NaturalSortOrder>
 %
 %% Examples %%
 %

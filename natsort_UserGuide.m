@@ -1,23 +1,15 @@
 %% |NATSORT| User Guide
 %
+% GitHub: <https://github.com/DrosteEffect/NaturalSortOrder>
+%
 % The function <https://www.mathworks.com/matlabcentral/fileexchange/34464
 % |NATSORT|> sorts the elements of a text array |A| (cell/string/...)
 % taking into account number values within the text. This is known as
 % <https://en.wikipedia.org/wiki/Natural_sort_order _natural sort order_>.
+%
 % Note that MATLAB's inbuilt <https://www.mathworks.com/help/matlab/ref/sort.html
 % |SORT|> function sorts text by <https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html
 % character code>, as does |SORT| in most programming languages.
-%
-% Other useful text sorting functions:
-%
-% * Natural order sort of filenames, foldernames, and filepaths:
-% <https://www.mathworks.com/matlabcentral/fileexchange/47434 |NATSORTFILES|>
-% * Natural order sort the rows of a string/cell/table/etc array:
-% <https://www.mathworks.com/matlabcentral/fileexchange/47433 |NATSORTROWS|>
-% * Sort text into the order of arbitrary/custom text sequences:
-% <https://www.mathworks.com/matlabcentral/fileexchange/132263 |ARBSORT|>
-%
-% Both |NATSORTFILES| and |NATSORTROWS| call |NATSORT|.
 %
 %% Basic Usage: Integer Numbers
 %
@@ -220,3 +212,24 @@ natsort(Ap, [], @arbsort) % download ARBSORT from FEX 132263.
 % <https://www.mathworks.com/help/matlab/ref/regexp.html |REGEXP|>'s
 % outputs displayed and updated as you type:
 iregexp('x1.23y45.6789z','(\d+)\.?(\d*)') % download IREGEXP from FEX 48930.
+%% Performance Example
+%
+% The log-log plot shows the execution time of |NATSORT| for increasing
+% numbers of randomly generated alphanumeric character vectors. Every
+% vector contains at least one digit and one letter, with any additional
+% numeric and text characters occurring at random.
+S = load('natsort_Benchmark.mat');
+loglog(S.sizes,S.secondsNatsort,'o-')
+xlabel('Number of Elements')
+ylabel('Elapsed Time (Seconds)')
+grid on
+%% See Also
+%
+% * Natural order sort of filenames, foldernames, and filepaths:
+%   <https://www.mathworks.com/matlabcentral/fileexchange/47434 |NATSORTFILES|>
+% * Natural order sort the rows of a string/cell/table/etc array:
+%   <https://www.mathworks.com/matlabcentral/fileexchange/47433 |NATSORTROWS|>
+% * Sort text into the order of arbitrary/custom text sequences:
+%   <https://www.mathworks.com/matlabcentral/fileexchange/132263 |ARBSORT|>
+%
+% Note: both |NATSORTFILES| and |NATSORTROWS| call |NATSORT|.

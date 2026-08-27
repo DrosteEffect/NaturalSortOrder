@@ -42,10 +42,11 @@ function [B,ndx,dbg,seq] = arbsort(A,varargin)
 % >> arbsort(Af, drink, sml, 'seqprio')
 % ans = ["S_tea","M_tea","L_tea","S_coffee","M_coffee"]
 %
+% To sort dates, timestamps, or calendar values: use DATETIME() and SORT().
 % To sort the elements of a string/cell array use NATSORT (File Exchange 34464)
 % To sort the rows of a string/cell/table use NATSORTROWS (File Exchange 47433)
 % To sort any file-names or folder-names use NATSORTFILES (File Exchange 47434)
-% To sort dates, timestamps, or calendar values: use DATETIME() and SORT().
+% GitHub repository: <https://github.com/DrosteEffect/NaturalSortOrder>
 %
 %% Sequence Text Vector %%
 %
